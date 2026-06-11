@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPSgames | Play Amazing Games</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* ==========================================================================
+           GLOBAL VARIABLES & MODERN RESET
+           ========================================================================== */
+        :root {
+            /* Neon Cyberpunk / Deep Space Palette */
+            --bg-base: #050505;
+            --bg-glass: rgba(15, 23, 42, 0.4);
+            --bg-glass-strong: rgba(15, 23, 42, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-hover: rgba(255, 255, 255, 0.2);
+            
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --secondary: #ec4899;
+            --secondary-glow: rgba(236, 72, 153, 0.5);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.5);
+            --accent-green: #10b981;
+            --accent-red: #f43f5e;
+            --accent-yellow: #f59e0b;
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            
+            --shadow-glass: 0 4px 20px 0 rgba(0, 0, 0, 0.4);
+            --shadow-neon: 0 0 15px var(--primary-glow);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.5;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Abstract Animated Mesh Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at top left, #1e1b4b, #000000);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--primary); animation-delay: 0s; }
+        .orb-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--secondary); animation-delay: -5s; }
+        .orb-3 { top: 40%; left: 60%; width: 40vw; height: 40vw; background: var(--accent-cyan); animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, 5%) scale(1.1); }
+            66% { transform: translate(-5%, 10%) scale(0.9); }
+            100% { transform: translate(0, -5%) scale(1); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ==========================================================================
+           TYPOGRAPHY & UTILITIES
+           ========================================================================== */
+        .text-gradient {
+            background: linear-gradient(135deg, #c4b5fd, #f9a8d4, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hidden { display: none !important; }
+
+        /* ==========================================================================
+           MAIN LAYOUT & HEADER
+           ========================================================================== */
+        .app-container {
+            max-width: 1100px; /* Reduced for smaller feel */
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeDown 0.8s ease-out;
+        }
+
+        .brand-logo {
+            font-size: clamp(2rem, 5vw, 3.5rem); /* Fluid scaling */
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 0.25rem;
+            line-height: 1.1;
+        }
+
+        .version-badge {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid var(--border-glass);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-glass);
+        }
+
+        /* ==========================================================================
+           DASHBOARD GAME GRID (GLASSMORPHISM CARDS)
+           ========================================================================== */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Tighter grid */
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .game-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            border: 1px solid var(--border-glass);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-glass);
+            animation: fadeUp 0.6s ease-out backwards;
+            min-height: 200px;
+        }
+
+        .game-card:nth-child(1) { animation-delay: 0.05s; }
+        .game-card:nth-child(2) { animation-delay: 0.1s; }
+        .game-card:nth-child(3) { animation-delay: 0.15s; }
+        .game-card:nth-child(4) { animation-delay: 0.2s; }
+        .game-card:nth-child(5) { animation-delay: 0.25s; }
+        .game-card:nth-child(6) { animation-delay: 0.3s; }
+        .game-card:nth-child(7) { animation-delay: 0.35s; }
+        .game-card:nth-child(8) { animation-delay: 0.4s; }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .game-card:hover::before { opacity: 1; }
+
+        .card-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-glass);
+            transition: var(--transition-bounce);
+        }
+
+        .game-card:hover .card-icon-wrap {
+            transform: scale(1.1) rotate(-5deg);
+            background: var(--primary-glow);
+            border-color: var(--primary);
+        }
+
+        .card-icon-wrap i {
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .game-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+
+        .game-card p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        /* Buttons */
+        .btn-play {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--border-glass);
+            padding: 0.6rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .game-card:hover .btn-play {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glass);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition-bounce);
+            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+            border: none;
+            box-shadow: 0 2px 10px rgba(236, 72, 153, 0.3);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(236, 72, 153, 0.5);
+        }
+        
+        .btn-secondary { 
+            background: rgba(255,255,255,0.05); 
+            color: var(--text-main); 
+        }
+        .btn-secondary:hover { 
+            background: rgba(255,255,255,0.1); 
+            transform: translateY(-2px);
+        }
+        .btn-secondary.active { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary-glow); 
+            box-shadow: var(--shadow-neon);
+        }
+
+        /* ==========================================================================
+           MODAL / GAME VIEW OVERLAY
+           ========================================================================== */
+        .game-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .game-window {
+            background: rgba(15, 23, 42, 0.85);
+            width: 100%;
+            max-width: 700px; /* Reduced max-width for tighter feel */
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+            padding: 2rem;
+            border: 1px solid var(--border-glass);
+            transform: scale(0.95) translateY(10px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .game-overlay.active .game-window {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .close-game {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--bg-glass-strong);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-bounce);
+            z-index: 10;
+        }
+
+        .close-game:hover {
+            background: var(--accent-red);
+            transform: rotate(90deg);
+            border-color: var(--accent-red);
+        }
+
+        /* Generic Game UI Elements */
+        .game-header { text-align: center; margin-bottom: 1.5rem; padding-right: 30px;}
+        .game-title { 
+            font-size: clamp(1.5rem, 4vw, 2rem); 
+            font-weight: 800; 
+            margin-bottom: 0.25rem; 
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .game-stats { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1rem; 
+            margin-bottom: 1.5rem; 
+            flex-wrap: wrap;
+        }
+        .stat-item { 
+            background: rgba(0,0,0,0.3); 
+            padding: 0.6rem 1.2rem; 
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glass);
+            text-align: center;
+            min-width: 90px;
+        }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
+        .stat-value { font-size: 1.2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; }
+
+        .game-controls { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+        /* ==========================================================================
+           GAME SPECIFIC: GUESS THE NUMBER
+           ========================================================================== */
+        .gtn-input-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        #gtn-input { 
+            background: rgba(0,0,0,0.4); 
+            border: 2px solid var(--border-glass); 
+            padding: 0.5rem; 
+            font-size: 2.5rem; 
+            width: 150px; 
+            text-align: center; 
+            color: #fff; 
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: var(--transition-fast);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        #gtn-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan-glow); }
+        .gtn-feedback { font-size: 1rem; min-height: 1.5em; font-weight: 500; text-align: center;}
+        .gtn-history { 
+            margin-top: 1.5rem; 
+            width: 100%; 
+            max-height: 100px; 
+            overflow-y: auto; 
+            background: rgba(0,0,0,0.2); 
+            border-radius: var(--radius-sm); 
+            padding: 1rem; 
+            border: 1px solid var(--border-glass);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+        .gtn-history-item { 
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; 
+            font-size: 0.85rem; 
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ==========================================================================
+           GAME SPECIFIC: SLIDING PUZZLE
+           ========================================================================== */
+        .puzzle-board { 
+            display: grid; 
+            gap: 8px; 
+            margin: 0 auto; 
+            width: 100%;
+            max-width: 350px; 
+            aspect-ratio: 1/1; 
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glass);
+        }
+        .puzzle-tile {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .puzzle-tile:hover:not(.empty) { 
+            transform: scale(1.05) translateY(-3px); 
+            z-index: 10;
+        }
+        .puzzle-tile.empty { background: transparent; cursor: default; border: 2px dashed rgba(255,255,255,0.1); box-shadow: none; }
+
+        /* ==========================================================================
+           GAME SPECIFIC: MEMORY MATCH
+           ========================================================================== */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 500px;
+        }
+        .m-card {
+            aspect-ratio: 3/4;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            perspective: 1000px;
+        }
+        .m-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        .m-card.flipped .m-card-inner { transform: rotateY(180deg); }
+        .m-card.matched .m-card-inner { opacity: 0.3; filter: grayscale(1); }
+        
+        .m-card-front, .m-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glass);
+        }
+        .m-card-front { 
+            background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9)); 
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        .m-card-back { 
+            background: #fff; 
+            transform: rotateY(180deg); 
+            font-size: 2rem; 
+            border-color: #fff;
+        }
+
+        /* ==========================================================================
+           GAME SPECIFIC: SNAKE ULTRA
+           ========================================================================== */
+        .snake-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1/1;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            grid-template-rows: repeat(16, 1fr);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            /* Grid background scaled using percentages instead of fixed px */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 6.25% 6.25%; 
+            overflow: hidden;
+        }
+        .snake-node { 
+            background: var(--accent-green); 
+            border-radius: 3px; 
+            z-index: 2; 
+            margin: 1px;
+        }
+        .snake-head { 
+            background: #34d399; 
+            border-radius: 6px; 
+            z-index: 3; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
+            margin: 1px;
+        }
+        .snake-head::before, .snake-head::after {
+            content: ''; position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; top: 20%;
+        }
+        .snake-head::before { left: 20%; }
+        .snake-head::after { right: 20%; }
+        .apple { 
+            background: var(--accent-red); 
+            border-radius: 50%; 
+            z-index: 1; 
+            margin: 2px;
+            animation: pulse 1s infinite;
+        }
+        
+        .head-up { transform: rotate(0deg); }
+        .head-right { transform: rotate(90deg); }
+        .head-down { transform: rotate(180deg); }
+        .head-left { transform: rotate(270deg); }
+
+        .dpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 150px; margin: 1.5rem auto 0; }
+        .dbtn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--border-glass);
+            width: 45px; height: 45px; 
+            border-radius: var(--radius-sm); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.2rem; cursor: pointer;
+            color: var(--text-muted);
+        }
+        .dbtn:active { background: var(--primary); color: #fff; transform: scale(0.9); }
+
+        /* ==========================================================================
+           GAME SPECIFIC: DOTS & BOXES
+           ========================================================================== */
+        .dots-board {
+            display: grid; gap: 0; margin: 0 auto; background: rgba(0,0,0,0.2);
+            padding: 20px; border-radius: var(--radius-md); position: relative;
+            border: 1px solid var(--border-glass);
+            overflow: auto; /* Allow scroll if extremely small */
+        }
+        .dot { 
+            width: 10px; height: 10px; background: #fff; border-radius: 50%; z-index: 5; 
+            transform: translate(-2px, -2px);
+        }
+        .line { 
+            background: rgba(255,255,255,0.05); cursor: pointer; transition: var(--transition-fast); z-index: 4; 
+            border-radius: 10px;
+        }
+        .line:hover { background: rgba(255,255,255,0.3); }
+        .line.active { cursor: default; }
+        .line.p1-line { background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+        .line.p2-line { background: var(--secondary); box-shadow: 0 0 10px var(--secondary); }
+        .box { 
+            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; 
+            transition: all 0.4s; z-index: 1; border-radius: 4px;
+            transform: scale(0.5); opacity: 0;
+        }
+        .box.p1-box { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); transform: scale(1); opacity: 1; }
+        .box.p2-box { background: rgba(236, 72, 153, 0.2); color: var(--secondary); transform: scale(1); opacity: 1; }
+
+        /* ==========================================================================
+           GAME SPECIFIC: TIC TAC TOE
+           ========================================================================== */
+        .ttt-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 280px; margin: 0 auto;
+        }
+        .ttt-cell {
+            aspect-ratio: 1/1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; font-weight: 900; cursor: pointer;
+            transition: var(--transition-bounce);
+        }
+        .ttt-cell:hover:not(.taken) { background: rgba(255,255,255,0.05); transform: translateY(-3px); }
+        .ttt-cell.x { color: var(--primary); text-shadow: 0 0 10px currentColor;}
+        .ttt-cell.o { color: var(--accent-yellow); text-shadow: 0 0 10px currentColor;}
+
+        /* ==========================================================================
+           GAME SPECIFIC: CHECKERS
+           ========================================================================== */
+        .checkers-board {
+            display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 400px; margin: 0 auto;
+            aspect-ratio: 1/1; border: 4px solid rgba(15,23,42,0.8); border-radius: var(--radius-sm);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .sq { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .sq.dark { background: #0f172a; }
+        .sq.light { background: #334155; }
+        .sq.highlight::after {
+            content: ''; position: absolute; width: 40%; height: 40%; background: rgba(16, 185, 129, 0.6);
+            border-radius: 50%; animation: pulse 1.5s infinite;
+        }
+        .piece {
+            width: 80%; height: 80%; border-radius: 50%; cursor: pointer; transition: transform 0.2s;
+            box-shadow: inset 0 3px 6px rgba(255,255,255,0.3), 0 3px 6px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10;
+        }
+        .piece.p1 { background: radial-gradient(circle at 30% 30%, #ef4444, #991b1b); border: 2px solid #7f1d1d; }
+        .piece.p2 { background: radial-gradient(circle at 30% 30%, #e2e8f0, #64748b); border: 2px solid #475569; }
+        .piece.king::before { content: '\265B'; font-size: 1.2rem; color: rgba(255,255,255,0.8); }
+        .piece.selected { transform: scale(1.15) translateY(-3px); border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan); }
+
+        /* ==========================================================================
+           GAME SPECIFIC: HANGMAN
+           ========================================================================== */
+        .hangman-wrap { display: flex; flex-direction: column; align-items: center; width: 100%;}
+        .hangman-svg { 
+            width: 180px; height: 220px; margin-bottom: 1rem; 
+        }
+        .hangman-svg line, .hangman-svg circle { 
+            stroke: #fff; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        .hangman-svg .base-struct { opacity: 1; stroke: #475569; }
+        .hangman-svg .visible { opacity: 1; stroke: var(--accent-red); filter: drop-shadow(0 0 5px var(--accent-red)); }
+        
+        .hangman-word { 
+            font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 800; letter-spacing: 0.5rem; margin-bottom: 2rem; 
+            text-transform: uppercase; font-family: 'JetBrains Mono', monospace; text-align: center;
+        }
+        .hangman-keyboard { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 500px; }
+        .key { 
+            width: 35px; height: 35px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); 
+            display: flex; align-items: center; justify-content: center; border-radius: 4px; 
+            cursor: pointer; font-weight: 600; font-size: 1rem; transition: var(--transition-fast);
+        }
+        .key:hover:not(.disabled) { background: var(--primary); border-color: var(--primary); transform: translateY(-2px); }
+        .key.disabled { opacity: 0.2; cursor: default; transform: scale(0.9); }
+        .key.correct { background: var(--accent-green); border-color: var(--accent-green); opacity: 1; transform: none;}
+        .key.wrong { background: rgba(244, 63, 94, 0.2); border-color: var(--accent-red); color: var(--accent-red); opacity: 0.5; }
+
+        /* ==========================================================================
+           CUSTOM TOAST ALERTS
+           ========================================================================== */
+        .modern-toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+        .modern-toast {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px var(--primary-glow);
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modern-toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* ==========================================================================
+           ANIMATIONS & MEDIA QUERIES (Mobile First Optimization)
+           ========================================================================== */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .app-container { padding: 1.5rem 0.75rem; }
+            .game-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;}
+            .game-window { padding: 1.5rem 1rem; border-radius: var(--radius-lg); }
+            .close-game { top: 10px; right: 10px; width: 32px; height: 32px; font-size: 1rem;}
+            .game-stats { gap: 0.5rem; margin-bottom: 1rem; }
+            .stat-item { padding: 0.5rem; min-width: 70px; }
+            .stat-value { font-size: 1rem; }
+            .memory-board { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+            .m-card-front { font-size: 1.2rem; }
+            .dots-board { padding: 10px; }
+            .btn-action { padding: 6px 12px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .game-grid { grid-template-columns: 1fr; } /* Stack on phones */
+            .game-card { min-height: auto; align-items: center; text-align: center; }
+            .card-icon-wrap { margin-bottom: 0.5rem; }
+            .puzzle-tile { font-size: 1.2rem; }
+            .ttt-cell { font-size: 2.5rem; }
+            #gtn-input { font-size: 2rem; width: 120px; }
+            .hangman-word { letter-spacing: 0.2rem; }
+        }
+        
+        footer {
+            margin-top: auto; text-align: center; padding: 2rem 0 1rem;
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 500;
+        }
+        footer span { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="bg-mesh">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<div id="toast-container" class="modern-toast-container"></div>
+
+<div class="app-container">
+    <header>
+        <div class="brand-logo text-gradient">SPSgames</div>
+        <div class="version-badge"><i class="ph-fill ph-device-mobile"></i> Compact Ultra Edition</div>
+    </header>
+
+    <div class="game-grid" id="main-grid">
+        <div class="game-card" onclick="Engine.launch('gtn')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-hash"></i></div>
+                <h3>Guess The Number</h3>
+                <p>Pure logic. Find the hidden number within minimal attempts.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('puzzle')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-squares-four"></i></div>
+                <h3>Sliding Puzzle</h3>
+                <p>Classic sliding tile puzzle. Choose 3x3 or 4x4 challenges.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('memory')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-brain"></i></div>
+                <h3>Memory Match</h3>
+                <p>Train your brain. Play Solo or challenge our adaptive AI.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('snake')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-activity"></i></div>
+                <h3>Snake Ultra</h3>
+                <p>Smooth 60FPS action with progressive speed and smiling heads.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('dots')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-bounding-box"></i></div>
+                <h3>Dots & Boxes</h3>
+                <p>Strategic territory control. Outsmart the computer or a friend.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('ttt')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-x-circle"></i></div>
+                <h3>Tic Tac Toe</h3>
+                <p>The ultimate showdown. Can you beat the Minimax algorithm?</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('checkers')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-crown"></i></div>
+                <h3>Checkers</h3>
+                <p>Classic board game with mandatory captures and king logic.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+        <div class="game-card" onclick="Engine.launch('hangman')">
+            <div>
+                <div class="card-icon-wrap"><i class="ph ph-user-minus"></i></div>
+                <h3>Hangman</h3>
+                <p>Word-guessing challenge with dynamic 4-7 letter generator.</p>
+            </div>
+            <button class="btn-play">Play</button>
+        </div>
+    </div>
+
+    <footer>
+        Developed By Soham Deshmukh | <span>SPSgames</span>
+    </footer>
+</div>
+
+<div id="game-overlay" class="game-overlay">
+    <div class="game-window" id="game-window">
+        <button class="close-game" onclick="Engine.close()"><i class="ph ph-x"></i></button>
+        <div id="game-content">
+            </div>
+    </div>
+</div>
+
+<script>
+/**
+* ============================================================================================
+* MODERN UI OVERRIDES
+* ============================================================================================
+*/
+// Custom Alert System to maintain immersive UI
+window.alert = function(message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'modern-toast';
+    toast.innerText = message;
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove after 3.5s
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400); // wait for transition
+    }, 3500);
+};
+
+/**
+* ============================================================================================
+* CORE ENGINE ARCHITECTURE
+* ============================================================================================
+*/
+const Engine = {
+    activeGame: null,
+    
+    launch(gameId) {
+        document.getElementById('game-overlay').classList.add('active');
+        const container = document.getElementById('game-content');
+        container.innerHTML = ''; 
+        
+        switch(gameId) {
+            case 'gtn': GTN.init(container); break;
+            case 'puzzle': Puzzle.init(container); break;
+            case 'memory': Memory.init(container); break;
+            case 'snake': Snake.init(container); break;
+            case 'dots': Dots.init(container); break;
+            case 'ttt': TTT.init(container); break;
+            case 'checkers': Checkers.init(container); break;
+            case 'hangman': Hangman.init(container); break;
+        }
+        this.activeGame = gameId;
+    },
+
+    close() {
+        document.getElementById('game-overlay').classList.remove('active');
+        if(this.activeGame === 'snake') Snake.stop();
+        if(this.activeGame === 'dots') Dots.stop();
+        if(this.activeGame === 'gtn' && GTN.timerInt) clearInterval(GTN.timerInt);
+        if(this.activeGame === 'puzzle' && Puzzle.timerInt) clearInterval(Puzzle.timerInt);
+        this.activeGame = null;
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: GUESS THE NUMBER
+* ============================================================================================
+*/
+const GTN = {
+    target: 0,
+    attempts: 0,
+    startTime: 0,
+    history: [],
+    timerInt: null,
+    timerStarted: false,
+
+    init(container) {
+        this.resetState();
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Guess The Number</h1>
+                <p style="color:var(--text-muted)">Find the secret number between 1 and 100</p>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">Attempts</div><div class="stat-value" id="gtn-att">0</div></div>
+                <div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" id="gtn-timer">0s</div></div>
+            </div>
+            <div class="gtn-input-wrap">
+                <div class="gtn-feedback" id="gtn-msg" style="color: var(--accent-cyan);">Enter a number to start. Timer starts on first entry.</div>
+                <input type="number" id="gtn-input" min="1" max="100" placeholder="00">
+                <button class="btn-action btn-primary" onclick="GTN.check()">Submit Guess</button>
+            </div>
+            <div class="gtn-history" id="gtn-history"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="GTN.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.target = Math.floor(Math.random() * 100) + 1;
+
+        const input = document.getElementById('gtn-input');
+        input.addEventListener('keypress', (e) => { if(e.key === 'Enter') this.check(); });
+        input.focus();
+    },
+
+    resetState() {
+        this.attempts = 0;
+        this.history = [];
+        this.timerStarted = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+    },
+
+    startTimer() {
+        this.startTime = Date.now();
+        this.timerInt = setInterval(() => {
+            const sec = Math.floor((Date.now() - this.startTime) / 1000);
+            document.getElementById('gtn-timer').innerText = sec + 's';
+        }, 1000);
+    },
+
+    check() {
+        const input = document.getElementById('gtn-input');
+        const val = parseInt(input.value);
+        const msg = document.getElementById('gtn-msg');
+        
+        if(isNaN(val) || val < 1 || val > 100) {
+            msg.innerText = "Error: Out of bounds (1-100)";
+            msg.style.color = "var(--accent-red)";
+            msg.style.textShadow = "0 0 10px var(--accent-red)";
+            return;
+        }
+
+        if(!this.timerStarted) {
+            this.timerStarted = true;
+            this.startTimer();
+        }
+
+        this.attempts++;
+        document.getElementById('gtn-att').innerText = this.attempts;
+        this.history.push(val);
+        this.renderHistory();
+
+        if(val === this.target) {
+            msg.innerText = `CORRECT ✅! It was ${this.target}`;
+            msg.style.color = "var(--accent-green)";
+            msg.style.textShadow = "0 0 10px rgba(16,185,129,0.5)";
+            clearInterval(this.timerInt);
+            input.disabled = true;
+            alert(`You Win 🏆! Found in ${this.attempts} attempts.`);
+        } else if(val < this.target) {
+            msg.innerText = "HIGHER ↑";
+            msg.style.color = "var(--accent-yellow)";
+            msg.style.textShadow = "none";
+        } else {
+            msg.innerText = "LOWER ↓";
+            msg.style.color = "var(--accent-yellow)";
+            msg.style.textShadow = "none";
+        }
+        input.value = '';
+        input.focus();
+    },
+
+    renderHistory() {
+        const hist = document.getElementById('gtn-history');
+        hist.innerHTML = this.history.map(h => `<span class="gtn-history-item">${h}</span>`).join('');
+        hist.scrollTop = hist.scrollHeight;
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: SLIDING PUZZLE
+* ============================================================================================
+*/
+const Puzzle = {
+    size: 3,
+    board: [],
+    moves: 0,
+    startTime: 0,
+    timerInt: null,
+    timerStarted: false,
+
+    init(container) {
+        this.timerStarted = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+        
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Sliding Puzzle</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${this.size === 3 ? 'active' : ''}" onclick="Puzzle.setComplexity(3)">3x3 Grid</button>
+                    <button class="btn-action btn-secondary ${this.size === 4 ? 'active' : ''}" onclick="Puzzle.setComplexity(4)">4x4 Grid</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">Moves</div><div class="stat-value" id="p-moves">0</div></div>
+                <div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" id="p-timer">0s</div></div>
+            </div>
+            <div id="p-board" class="puzzle-board"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-primary" onclick="Puzzle.shuffle()">Shuffle</button>
+                <button class="btn-action btn-secondary" onclick="Puzzle.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.render();
+        this.shuffle();
+    },
+
+    setComplexity(s) {
+        this.size = s;
+        this.init(document.getElementById('game-content'));
+    },
+
+    render() {
+        const boardEl = document.getElementById('p-board');
+        boardEl.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
+        this.board = Array.from({length: this.size * this.size}, (_, i) => i + 1);
+        this.board[this.board.length - 1] = 0; // Empty tile
+        this.updateDOM();
+    },
+
+    updateDOM() {
+        const boardEl = document.getElementById('p-board');
+        boardEl.innerHTML = '';
+        this.board.forEach((val, idx) => {
+            const div = document.createElement('div');
+            div.className = `puzzle-tile ${val === 0 ? 'empty' : ''}`;
+            div.innerText = val === 0 ? '' : val;
+            if(val !== 0) div.onclick = () => this.move(idx);
+            boardEl.appendChild(div);
+        });
+    },
+
+    startTimer() {
+        this.startTime = Date.now();
+        this.timerInt = setInterval(() => {
+            const sec = Math.floor((Date.now() - this.startTime) / 1000);
+            document.getElementById('p-timer').innerText = sec + 's';
+        }, 1000);
+    },
+
+    move(idx) {
+        const emptyIdx = this.board.indexOf(0);
+        const row = Math.floor(idx / this.size);
+        const col = idx % this.size;
+        const eRow = Math.floor(emptyIdx / this.size);
+        const eCol = emptyIdx % this.size;
+
+        const isAdj = Math.abs(row - eRow) + Math.abs(col - eCol) === 1;
+
+        if(isAdj) {
+            if(!this.timerStarted) {
+                this.timerStarted = true;
+                this.startTimer();
+            }
+
+            [this.board[idx], this.board[emptyIdx]] = [this.board[emptyIdx], this.board[idx]];
+            this.moves++;
+            document.getElementById('p-moves').innerText = this.moves;
+            this.updateDOM();
+            this.checkWin();
+        }
+    },
+
+    shuffle() {
+        this.moves = 0;
+        document.getElementById('p-moves').innerText = "0";
+        document.getElementById('p-timer').innerText = "0s";
+        
+        this.timerStarted = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+
+        for(let i = 0; i < 250; i++) {
+            const emptyIdx = this.board.indexOf(0);
+            const neighbors = [];
+            const r = Math.floor(emptyIdx / this.size);
+            const c = emptyIdx % this.size;
+
+            if(r > 0) neighbors.push(emptyIdx - this.size);
+            if(r < this.size - 1) neighbors.push(emptyIdx + this.size);
+            if(c > 0) neighbors.push(emptyIdx - 1);
+            if(c < this.size - 1) neighbors.push(emptyIdx + 1);
+
+            const moveIdx = neighbors[Math.floor(Math.random() * neighbors.length)];
+            [this.board[emptyIdx], this.board[moveIdx]] = [this.board[moveIdx], this.board[emptyIdx]];
+        }
+        this.updateDOM();
+    },
+
+    checkWin() {
+        const win = this.board.every((val, idx) => {
+            if(idx === this.board.length - 1) return val === 0;
+            return val === idx + 1;
+        });
+
+        if(win) {
+            clearInterval(this.timerInt);
+            setTimeout(() => alert(`Puzzle Completed ✅! Total Moves: ${this.moves}`), 100);
+        }
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: MEMORY MATCH
+* ============================================================================================
+*/
+const Memory = {
+    mode: 'solo',
+    difficulty: 'medium',
+    cards: [],
+    flipped: [],
+    matches: 0,
+    lock: false,
+    scores: { p1: 0, p2: 0 },
+    turn: 'p1',
+    aiMemory: new Map(),
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Memory Match</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${this.mode === 'solo' ? 'active':''}" onclick="Memory.setMode('solo')">Solo</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'friend' ? 'active':''}" onclick="Memory.setMode('friend')">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'ai' ? 'active':''}" onclick="Memory.setMode('ai')">VS AI</button>
+                </div>
+                <div id="m-diff-controls" class="game-controls ${this.mode !== 'ai' ? 'hidden' : ''}">
+                    <button class="btn-action btn-secondary ${this.difficulty === 'easy' ? 'active':''}" onclick="Memory.setDiff('easy')">Easy AI</button>
+                    <button class="btn-action btn-secondary ${this.difficulty === 'medium' ? 'active':''}" onclick="Memory.setDiff('medium')">Medium AI</button>
+                    <button class="btn-action btn-secondary ${this.difficulty === 'hard' ? 'active':''}" onclick="Memory.setDiff('hard')">Hard AI</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label" id="p1-label">Score</div><div class="stat-value" id="m-s1">0</div></div>
+                <div class="stat-item" id="p2-stat"><div class="stat-label" id="p2-label">P2 Score</div><div class="stat-value" id="m-s2">0</div></div>
+                <div class="stat-item"><div class="stat-label">Turn</div><div class="stat-value" id="m-turn">P1</div></div>
+            </div>
+            <div id="m-board" class="memory-board"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="Memory.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.setupBoard();
+    },
+
+    setMode(m) { this.mode = m; this.init(document.getElementById('game-content')); },
+    setDiff(d) { this.difficulty = d; this.init(document.getElementById('game-content')); },
+
+    setupBoard() {
+        const icons = [
+            '<i class="ph ph-cpu"></i>', '<i class="ph ph-database"></i>', 
+            '<i class="ph ph-fingerprint"></i>', '<i class="ph ph-globe-hemisphere-east"></i>',
+            '<i class="ph ph-lightning"></i>', '<i class="ph ph-planet"></i>',
+            '<i class="ph ph-rocket-launch"></i>', '<i class="ph ph-shield-check"></i>', 
+            '<i class="ph ph-sword"></i>',
+            '<i class="ph ph-cpu"></i>', '<i class="ph ph-database"></i>', 
+            '<i class="ph ph-fingerprint"></i>', '<i class="ph ph-globe-hemisphere-east"></i>',
+            '<i class="ph ph-lightning"></i>', '<i class="ph ph-planet"></i>',
+            '<i class="ph ph-rocket-launch"></i>', '<i class="ph ph-shield-check"></i>', 
+            '<i class="ph ph-sword"></i>'
+        ];
+        this.cards = icons.sort(() => Math.random() - 0.5);
+        this.flipped = [];
+        this.matches = 0;
+        this.scores = { p1: 0, p2: 0 };
+        this.turn = 'p1';
+        this.lock = false;
+        this.aiMemory.clear();
+
+        if(this.mode === 'solo') {
+            document.getElementById('p2-stat').classList.add('hidden');
+            document.getElementById('p1-label').innerText = "Matches";
+        }
+
+        const board = document.getElementById('m-board');
+        board.innerHTML = '';
+        this.cards.forEach((icon, idx) => {
+            const card = document.createElement('div');
+            card.className = 'm-card';
+            card.dataset.idx = idx;
+            card.innerHTML = `
+                <div class="m-card-inner">
+                    <div class="m-card-front"></div>
+                    <div class="m-card-back" style="color:var(--bg-base);">${icon}</div>
+                </div>
+            `;
+            card.onclick = () => this.handleFlip(idx);
+            board.appendChild(card);
+        });
+        this.updateUI();
+    },
+
+    handleFlip(idx) {
+        if(this.lock) return;
+        if(this.mode === 'ai' && this.turn === 'p2') return;
+        const cardEls = document.querySelectorAll('.m-card');
+        if(cardEls[idx].classList.contains('flipped') || cardEls[idx].classList.contains('matched')) return;
+
+        this.processFlip(idx);
+    },
+
+    processFlip(idx) {
+        const cardEls = document.querySelectorAll('.m-card');
+        const icon = this.cards[idx];
+        
+        cardEls[idx].classList.add('flipped');
+        this.flipped.push({idx, icon});
+
+        this.aiMemory.set(idx, icon);
+
+        if(this.flipped.length === 2) {
+            this.lock = true;
+            const [a, b] = this.flipped;
+
+            if(a.icon === b.icon) {
+                setTimeout(() => {
+                    cardEls[a.idx].classList.add('matched');
+                    cardEls[b.idx].classList.add('matched');
+                    this.scores[this.turn]++;
+                    this.matches++;
+                    this.flipped = [];
+                    this.lock = false;
+                    this.updateUI();
+                    this.checkWin();
+                    if(this.mode === 'ai' && this.turn === 'p2' && this.matches < 9) this.aiTurn();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    cardEls[a.idx].classList.remove('flipped');
+                    cardEls[b.idx].classList.remove('flipped');
+                    this.flipped = [];
+                    this.lock = false;
+                    this.turn = this.turn === 'p1' ? 'p2' : 'p1';
+                    this.updateUI();
+                    if(this.mode === 'ai' && this.turn === 'p2') this.aiTurn();
+                }, 800);
+            }
+        }
+    },
+
+    aiTurn() {
+        if(this.matches === 9) return;
+        
+        const cardEls = document.querySelectorAll('.m-card');
+        const available = [];
+        cardEls.forEach((el, i) => { if(!el.classList.contains('matched') && !el.classList.contains('flipped')) available.push(i); });
+
+        let choice1, choice2;
+        let knownPair = null;
+        const seen = new Map();
+        for(let [idx, icon] of this.aiMemory) {
+            if(cardEls[idx].classList.contains('matched')) continue;
+            if(seen.has(icon)) {
+                knownPair = [seen.get(icon), idx];
+                break;
+            }
+            seen.set(icon, idx);
+        }
+
+        const rand = Math.random();
+        const chance = this.difficulty === 'easy' ? 0.2 : (this.difficulty === 'medium' ? 0.6 : 0.95);
+
+        if(knownPair && rand < chance) {
+            [choice1, choice2] = knownPair;
+        } else {
+            choice1 = available[Math.floor(Math.random() * available.length)];
+            const icon1 = this.cards[choice1];
+            
+            let knownMatch = -1;
+            for(let [idx, icon] of this.aiMemory) {
+                if(icon === icon1 && idx !== choice1 && !cardEls[idx].classList.contains('matched')) {
+                    knownMatch = idx;
+                    break;
+                }
+            }
+            
+            if(knownMatch !== -1 && rand < chance) {
+                choice2 = knownMatch;
+            } else {
+                const available2 = available.filter(i => i !== choice1);
+                choice2 = available2[Math.floor(Math.random() * available2.length)];
+            }
+        }
+
+        setTimeout(() => {
+            this.processFlip(choice1);
+            setTimeout(() => this.processFlip(choice2), 600);
+        }, 800);
+    },
+
+    updateUI() {
+        document.getElementById('m-s1').innerText = this.scores.p1;
+        document.getElementById('m-s2').innerText = this.scores.p2;
+        document.getElementById('m-turn').innerText = this.turn.toUpperCase();
+        document.getElementById('m-turn').style.color = this.turn === 'p1' ? 'var(--primary)' : 'var(--secondary)';
+    },
+
+    checkWin() {
+        if(this.matches === 9) {
+            let winMsg = "";
+            if(this.mode === 'solo') winMsg = "Game Completed ✅!";
+            else if(this.scores.p1 > this.scores.p2) winMsg = "Player 1 Wins 🏆!";
+            else if(this.scores.p2 > this.scores.p1) winMsg = "Player 2 Wins 🏆!";
+            else winMsg = "It's a Draw 🤝!";
+            
+            setTimeout(() => alert(winMsg), 400);
+        }
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: SNAKE ULTRA
+* ============================================================================================
+*/
+const Snake = {
+    grid: 16,
+    snake: [],
+    dir: {x: 1, y: 0},
+    nextDir: {x: 1, y: 0},
+    apple: {x: 5, y: 5},
+    score: 0,
+    speed: 200,
+    speedInc: 10,
+    gameLoop: null,
+    mode: 'medium',
+    isGameOver: false,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Snake Ultra</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${this.mode === 'slow' ? 'active':''}" onclick="Snake.setMode('slow')">Slow</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'medium' ? 'active':''}" onclick="Snake.setMode('medium')">Medium</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'fast' ? 'active':''}" onclick="Snake.setMode('fast')">Fast</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">Score</div><div class="stat-value" id="s-score">0</div></div>
+                <div class="stat-item"><div class="stat-label">Speed</div><div class="stat-value" id="s-speed">200ms</div></div>
+            </div>
+            <div id="s-board" class="snake-container"></div>
+            <div class="dpad">
+                <div></div><div class="dbtn" onclick="Snake.changeDir(0,-1)"><i class="ph ph-caret-up"></i></div><div></div>
+                <div class="dbtn" onclick="Snake.changeDir(-1,0)"><i class="ph ph-caret-left"></i></div><div class="dbtn" onclick="Snake.changeDir(0,1)"><i class="ph ph-caret-down"></i></div><div class="dbtn" onclick="Snake.changeDir(1,0)"><i class="ph ph-caret-right"></i></div>
+            </div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="Snake.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.reset();
+        window.addEventListener('keydown', this.handleKeys);
+    },
+
+    setMode(m) {
+        this.mode = m;
+        this.speedInc = m === 'slow' ? 10 : (m === 'medium' ? 15 : 20);
+        this.init(document.getElementById('game-content'));
+    },
+
+    reset() {
+        this.stop();
+        this.isGameOver = false;
+        this.snake = [{x: 2, y: 0}, {x: 1, y: 0}, {x: 0, y: 0}];
+        this.dir = {x: 1, y: 0};
+        this.nextDir = {x: 1, y: 0};
+        this.score = 0;
+        this.speed = 250;
+        this.spawnApple();
+        this.start();
+    },
+
+    start() {
+        if(this.isGameOver) return;
+        const loop = () => {
+            if(this.isGameOver) return;
+            this.update();
+            this.draw();
+            if(!this.isGameOver) {
+                this.gameLoop = setTimeout(loop, this.speed);
+            }
+        };
+        loop();
+    },
+
+    stop() {
+        if(this.gameLoop) clearTimeout(this.gameLoop);
+        window.removeEventListener('keydown', this.handleKeys);
+    },
+
+    handleKeys: (e) => {
+        if(['ArrowUp','w','W'].includes(e.key)) Snake.changeDir(0, -1);
+        if(['ArrowDown','s','S'].includes(e.key)) Snake.changeDir(0, 1);
+        if(['ArrowLeft','a','A'].includes(e.key)) Snake.changeDir(-1, 0);
+        if(['ArrowRight','d','D'].includes(e.key)) Snake.changeDir(1, 0);
+    },
+
+    changeDir(x, y) {
+        if(x !== -this.dir.x && y !== -this.dir.y) {
+            this.nextDir = {x, y};
+        }
+    },
+
+    spawnApple() {
+        this.apple = {
+            x: Math.floor(Math.random() * this.grid),
+            y: Math.floor(Math.random() * this.grid)
+        };
+        if(this.snake.some(s => s.x === this.apple.x && s.y === this.apple.y)) this.spawnApple();
+    },
+
+    update() {
+        if(this.isGameOver) return;
+
+        this.dir = this.nextDir;
+        const head = { x: this.snake[0].x + this.dir.x, y: this.snake[0].y + this.dir.y };
+
+        if(head.x < 0 || head.x >= this.grid || head.y < 0 || head.y >= this.grid) return this.triggerGameOver();
+        if(this.snake.some(s => s.x === head.x && s.y === head.y)) return this.triggerGameOver();
+
+        this.snake.unshift(head);
+
+        if(head.x === this.apple.x && head.y === this.apple.y) {
+            this.score += 10;
+            this.speed = Math.max(50, this.speed - this.speedInc);
+            document.getElementById('s-score').innerText = this.score;
+            document.getElementById('s-speed').innerText = this.speed + 'ms';
+            this.spawnApple();
+        } else {
+            this.snake.pop(); 
+        }
+    },
+
+    draw() {
+        if(this.isGameOver) return;
+        const board = document.getElementById('s-board');
+        if(!board) return;
+        board.innerHTML = '';
+        
+        const appleEl = document.createElement('div');
+        appleEl.className = 'apple';
+        appleEl.style.gridColumnStart = this.apple.x + 1;
+        appleEl.style.gridRowStart = this.apple.y + 1;
+        board.appendChild(appleEl);
+
+        this.snake.forEach((node, idx) => {
+            const el = document.createElement('div');
+            el.style.gridColumnStart = node.x + 1;
+            el.style.gridRowStart = node.y + 1;
+            
+            if(idx === 0) {
+                el.className = 'snake-head';
+                let dirClass = 'head-right';
+                if(this.dir.x === 1) dirClass = 'head-right';
+                if(this.dir.x === -1) dirClass = 'head-left';
+                if(this.dir.y === 1) dirClass = 'head-down';
+                if(this.dir.y === -1) dirClass = 'head-up';
+                el.classList.add(dirClass);
+            } else {
+                el.className = 'snake-node';
+            }
+            board.appendChild(el);
+        });
+    },
+
+    triggerGameOver() {
+        if(this.isGameOver) return; 
+        this.isGameOver = true;
+        this.stop();
+        setTimeout(() => alert(`Game Over 💀! Final Score: ${this.score}`), 50);
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: DOTS & BOXES
+* ============================================================================================
+*/
+const Dots = {
+    size: 4, 
+    lines: {}, 
+    boxes: {}, 
+    turn: 1,
+    scores: { 1: 0, 2: 0 },
+    isAI: false,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Dots & Boxes</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${!this.isAI ? 'active':''}" onclick="Dots.setMode(false)">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.isAI ? 'active':''}" onclick="Dots.setMode(true)">VS AI</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">P1 (CYAN)</div><div class="stat-value" id="d-s1" style="color:var(--accent-cyan);">0</div></div>
+                <div class="stat-item"><div class="stat-label">P2 (PINK)</div><div class="stat-value" id="d-s2" style="color:var(--secondary);">0</div></div>
+                <div class="stat-item"><div class="stat-label">Turn</div><div class="stat-value" id="d-turn">P1</div></div>
+            </div>
+            <div id="d-board" class="dots-board"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="Dots.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.reset();
+        
+        // Timeout ensures the container is attached before rendering, to calculate widths if needed
+        setTimeout(() => this.render(), 10);
+    },
+
+    setMode(ai) { this.isAI = ai; this.init(document.getElementById('game-content')); },
+
+    reset() {
+        this.lines = {};
+        this.boxes = {};
+        this.turn = 1;
+        this.scores = { 1: 0, 2: 0 };
+    },
+
+    render() {
+        const board = document.getElementById('d-board');
+        if(!board) return;
+        
+        // Dynamically scale dots board to fit smaller screens
+        let availableWidth = document.getElementById('game-window').clientWidth - 40;
+        let idealSize = 60;
+        let dotSize = 10;
+        
+        if (availableWidth < (this.size * 60 + 40)) {
+             idealSize = Math.floor((availableWidth - 40) / this.size);
+        }
+        const lineLen = Math.max(30, idealSize);
+
+        const totalSize = (this.size + 1) * dotSize + this.size * lineLen;
+        board.style.width = totalSize + 40 + 'px';
+        board.style.height = totalSize + 40 + 'px';
+        board.innerHTML = '';
+
+        for(let r = 0; r <= this.size; r++) {
+            for(let c = 0; c <= this.size; c++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.position = 'absolute';
+                dot.style.left = (c * (lineLen + dotSize) + 20) + 'px';
+                dot.style.top = (r * (lineLen + dotSize) + 20) + 'px';
+                board.appendChild(dot);
+
+                if(c < this.size) {
+                    const hLine = document.createElement('div');
+                    const id = `${r}-${c}-h`;
+                    hLine.className = `line ${this.lines[id] ? 'active p'+this.lines[id]+'-line' : ''}`;
+                    hLine.style.position = 'absolute';
+                    hLine.style.width = lineLen + 'px';
+                    hLine.style.height = '10px';
+                    hLine.style.left = (c * (lineLen + dotSize) + dotSize + 20) + 'px';
+                    hLine.style.top = (r * (lineLen + dotSize) + 20) + 'px';
+                    hLine.onclick = () => this.claimLine(r, c, 'h');
+                    board.appendChild(hLine);
+                }
+
+                if(r < this.size) {
+                    const vLine = document.createElement('div');
+                    const id = `${r}-${c}-v`;
+                    vLine.className = `line ${this.lines[id] ? 'active p'+this.lines[id]+'-line' : ''}`;
+                    vLine.style.position = 'absolute';
+                    vLine.style.width = '10px';
+                    vLine.style.height = lineLen + 'px';
+                    vLine.style.left = (c * (lineLen + dotSize) + 20) + 'px';
+                    vLine.style.top = (r * (lineLen + dotSize) + dotSize + 20) + 'px';
+                    vLine.onclick = () => this.claimLine(r, c, 'v');
+                    board.appendChild(vLine);
+                }
+
+                if(r < this.size && c < this.size) {
+                    const box = document.createElement('div');
+                    const id = `${r}-${c}`;
+                    box.className = `box ${this.boxes[id] ? 'p'+this.boxes[id]+'-box' : ''}`;
+                    box.innerText = this.boxes[id] ? (this.boxes[id] === 1 ? 'P1' : 'P2') : '';
+                    box.style.position = 'absolute';
+                    box.style.width = lineLen + 'px';
+                    box.style.height = lineLen + 'px';
+                    box.style.left = (c * (lineLen + dotSize) + dotSize + 20) + 'px';
+                    box.style.top = (r * (lineLen + dotSize) + dotSize + 20) + 'px';
+                    board.appendChild(box);
+                }
+            }
+        }
+        this.updateUI();
+    },
+
+    claimLine(r, c, dir) {
+        if(this.isAI && this.turn === 2) return;
+        const id = `${r}-${c}-${dir}`;
+        if(this.lines[id]) return; 
+
+        this.processClaim(r, c, dir);
+    },
+
+    processClaim(r, c, dir) {
+        const id = `${r}-${c}-${dir}`;
+        this.lines[id] = this.turn;
+        
+        let boxCaptured = false;
+        if(dir === 'h') {
+            if(this.checkBox(r, c)) boxCaptured = true;
+            if(this.checkBox(r-1, c)) boxCaptured = true;
+        } else {
+            if(this.checkBox(r, c)) boxCaptured = true;
+            if(this.checkBox(r, c-1)) boxCaptured = true;
+        }
+
+        if(!boxCaptured) {
+            this.turn = this.turn === 1 ? 2 : 1;
+        }
+
+        this.render();
+        this.checkEnd();
+
+        if(this.turn === 2 && this.isAI && !this.allBoxesClaimed()) {
+            setTimeout(() => this.aiMove(), 500);
+        }
+    },
+
+    checkBox(r, c) {
+        if(r < 0 || r >= this.size || c < 0 || c >= this.size) return false;
+        const id = `${r}-${c}`;
+        if(this.boxes[id]) return false;
+
+        const top = `${r}-${c}-h`;
+        const bottom = `${r+1}-${c}-h`;
+        const left = `${r}-${c}-v`;
+        const right = `${r}-${c+1}-v`;
+
+        if(this.lines[top] && this.lines[bottom] && this.lines[left] && this.lines[right]) {
+            this.boxes[id] = this.turn;
+            this.scores[this.turn]++;
+            return true;
+        }
+        return false;
+    },
+
+    aiMove() {
+        const available = [];
+        for(let r = 0; r <= this.size; r++) {
+            for(let c = 0; c <= this.size; c++) {
+                if(c < this.size && !this.lines[`${r}-${c}-h`]) available.push({r, c, d:'h'});
+                if(r < this.size && !this.lines[`${r}-${c}-v`]) available.push({r, c, d:'v'});
+            }
+        }
+
+        if(available.length === 0) return;
+
+        let choice = available.find(move => {
+            const tempLines = {...this.lines, [`${move.r}-${move.c}-${move.d}`]: 2};
+            return this.wouldComplete(move.r, move.c, move.d, tempLines);
+        });
+
+        if(!choice) {
+            const safe = available.filter(move => {
+                const tempLines = {...this.lines, [`${move.r}-${move.c}-${move.d}`]: 2};
+                return !this.wouldCreateThreat(move.r, move.c, move.d, tempLines);
+            });
+            if(safe.length > 0) choice = safe[Math.floor(Math.random() * safe.length)];
+        }
+
+        if(!choice) choice = available[Math.floor(Math.random() * available.length)];
+
+        this.processClaim(choice.r, choice.c, choice.d);
+    },
+
+    wouldComplete(r, c, d, lns) {
+        const check = (rr, cc) => {
+            if(rr < 0 || rr >= this.size || cc < 0 || cc >= this.size) return false;
+            return lns[`${rr}-${cc}-h`] && lns[`${rr+1}-${cc}-h`] && lns[`${rr}-${cc}-v`] && lns[`${rr}-${cc+1}-v`];
+        };
+        if(d === 'h') return check(r, c) || check(r-1, c);
+        return check(r, c) || check(r, c-1);
+    },
+
+    wouldCreateThreat(r, c, d, lns) {
+        const count = (rr, cc) => {
+            if(rr < 0 || rr >= this.size || cc < 0 || cc >= this.size) return 0;
+            let cnt = 0;
+            if(lns[`${rr}-${cc}-h`]) cnt++;
+            if(lns[`${rr+1}-${cc}-h`]) cnt++;
+            if(lns[`${rr}-${cc}-v`]) cnt++;
+            if(lns[`${rr}-${cc+1}-v`]) cnt++;
+            return cnt;
+        };
+        if(d === 'h') return count(r, c) === 3 || count(r-1, c) === 3;
+        return count(r, c) === 3 || count(r, c-1) === 3;
+    },
+
+    allBoxesClaimed() {
+        return Object.keys(this.boxes).length === this.size * this.size;
+    },
+
+    updateUI() {
+        document.getElementById('d-s1').innerText = this.scores[1];
+        document.getElementById('d-s2').innerText = this.scores[2];
+        document.getElementById('d-turn').innerText = `P${this.turn}`;
+        document.getElementById('d-turn').style.color = this.turn === 1 ? 'var(--accent-cyan)' : 'var(--secondary)';
+    },
+
+    checkEnd() {
+        if(this.allBoxesClaimed()) {
+            const msg = this.scores[1] > this.scores[2] ? "Player 1 Wins 🏆!" : (this.scores[2] > this.scores[1] ? "Player 2 Wins 🏆!" : "It's a Draw 🤝!");
+            setTimeout(() => alert(msg), 200);
+        }
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: TIC TAC TOE
+* ============================================================================================
+*/
+const TTT = {
+    board: Array(9).fill(null),
+    turn: 'X',
+    isAI: true,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Tic Tac Toe</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${!this.isAI ? 'active':''}" onclick="TTT.setMode(false)">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.isAI ? 'active':''}" onclick="TTT.setMode(true)">VS AI</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">Turn</div><div class="stat-value" id="t-turn">X</div></div>
+            </div>
+            <div class="ttt-grid" id="t-grid"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="TTT.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.board = Array(9).fill(null);
+        this.turn = 'X';
+        this.render();
+    },
+
+    setMode(ai) { this.isAI = ai; this.init(document.getElementById('game-content')); },
+
+    render() {
+        const grid = document.getElementById('t-grid');
+        grid.innerHTML = '';
+        this.board.forEach((val, idx) => {
+            const cell = document.createElement('div');
+            cell.className = `ttt-cell ${val ? 'taken ' + val.toLowerCase() : ''}`;
+            cell.innerText = val || '';
+            cell.onclick = () => this.move(idx);
+            grid.appendChild(cell);
+        });
+        document.getElementById('t-turn').innerText = this.turn;
+        document.getElementById('t-turn').style.color = this.turn === 'X' ? 'var(--primary)' : 'var(--accent-yellow)';
+    },
+
+    move(idx) {
+        if(this.board[idx] || this.checkWin(this.board)) return;
+        if(this.isAI && this.turn === 'O') return; 
+
+        this.board[idx] = this.turn;
+        this.render();
+
+        if(this.checkWin(this.board)) return setTimeout(() => alert(`Player ${this.turn} Wins 🏆!`), 100);
+        if(!this.board.includes(null)) return setTimeout(() => alert("It's a Draw 🤝!"), 100);
+
+        this.turn = this.turn === 'X' ? 'O' : 'X';
+        this.render();
+
+        if(this.isAI && this.turn === 'O') {
+            setTimeout(() => this.aiMove(), 500);
+        }
+    },
+
+    aiMove() {
+        let bestScore = -Infinity;
+        let move;
+        
+        for(let i = 0; i < 9; i++) {
+            if(!this.board[i]) {
+                this.board[i] = 'O';
+                let score = this.minimax(this.board, 0, false);
+                this.board[i] = null;
+                if(score > bestScore) {
+                    bestScore = score;
+                    move = i;
+                }
+            }
+        }
+        
+        this.board[move] = 'O';
+        this.render();
+        
+        if(this.checkWin(this.board)) return setTimeout(() => alert("AI Wins 🏆!"), 100);
+        if(!this.board.includes(null)) return setTimeout(() => alert("It's a Draw 🤝!"), 100);
+        
+        this.turn = 'X';
+        this.render();
+    },
+
+    minimax(board, depth, isMaximizing) {
+        let result = this.checkWin(board);
+        if(result === 'O') return 10 - depth;
+        if(result === 'X') return depth - 10;
+        if(!board.includes(null)) return 0;
+
+        if(isMaximizing) {
+            let bestScore = -Infinity;
+            for(let i=0; i<9; i++) {
+                if(!board[i]) {
+                    board[i] = 'O';
+                    let score = this.minimax(board, depth + 1, false);
+                    board[i] = null;
+                    bestScore = Math.max(score, bestScore);
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for(let i=0; i<9; i++) {
+                if(!board[i]) {
+                    board[i] = 'X';
+                    let score = this.minimax(board, depth + 1, true);
+                    board[i] = null;
+                    bestScore = Math.min(score, bestScore);
+                }
+            }
+            return bestScore;
+        }
+    },
+
+    checkWin(b) {
+        const ways = [
+            [0,1,2], [3,4,5], [6,7,8],
+            [0,3,6], [1,4,7], [2,5,8],
+            [0,4,8], [2,4,6]
+        ];
+        for(let w of ways) {
+            if(b[w[0]] && b[w[0]] === b[w[1]] && b[w[0]] === b[w[2]]) return b[w[0]];
+        }
+        return null;
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: CHECKERS
+* ============================================================================================
+*/
+const Checkers = {
+    board: [],
+    turn: 1, 
+    selected: null,
+    validMoves: [],
+    isAI: true,
+    forceJumps: true,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Checkers</h1>
+                <div class="game-controls">
+                    <button class="btn-action btn-secondary ${!this.isAI ? 'active':''}" onclick="Checkers.setMode(false)">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.isAI ? 'active':''}" onclick="Checkers.setMode(true)">VS AI</button>
+                </div>
+                <div class="game-controls" style="margin-top: 1rem;">
+                    <button class="btn-action btn-secondary" onclick="Checkers.toggleForceJumps()">
+                        Force Jumps: <span id="c-fj-val" style="color:${this.forceJumps ? 'var(--accent-green)':'var(--accent-red)'}">${this.forceJumps ? 'ON' : 'OFF'}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item"><div class="stat-label">Turn</div><div class="stat-value" id="c-turn">P1</div></div>
+                <div class="stat-item"><div class="stat-label">Status</div><div class="stat-value" id="c-status">Active</div></div>
+            </div>
+            <div id="c-board" class="checkers-board"></div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="Checkers.init(document.getElementById('game-content'))">Restart Game</button>
+            </div>
+        `;
+        this.setupBoard();
+        this.render();
+    },
+
+    setMode(ai) { this.isAI = ai; this.init(document.getElementById('game-content')); },
+    
+    toggleForceJumps() {
+        this.forceJumps = !this.forceJumps;
+        const valSpan = document.getElementById('c-fj-val');
+        if(valSpan) {
+            valSpan.innerText = this.forceJumps ? 'ON' : 'OFF';
+            valSpan.style.color = this.forceJumps ? 'var(--accent-green)' : 'var(--accent-red)';
+        }
+        this.selected = null;
+        this.validMoves = [];
+        this.render();
+    },
+
+    setupBoard() {
+        this.board = Array(8).fill(null).map(() => Array(8).fill(0));
+        for(let r = 0; r < 3; r++) {
+            for(let c = 0; c < 8; c++) if((r+c)%2 !== 0) this.board[r][c] = 2;
+        }
+        for(let r = 5; r < 8; r++) {
+            for(let c = 0; c < 8; c++) if((r+c)%2 !== 0) this.board[r][c] = 1;
+        }
+        this.turn = 1;
+        this.selected = null;
+        this.validMoves = [];
+    },
+
+    render() {
+        const boardEl = document.getElementById('c-board');
+        boardEl.innerHTML = '';
+        for(let r = 0; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                const sq = document.createElement('div');
+                sq.className = `sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
+                
+                const move = this.validMoves.find(m => m.r === r && m.c === c);
+                if(move) sq.classList.add('highlight');
+                
+                if(this.board[r][c] !== 0) {
+                    const piece = document.createElement('div');
+                    const type = this.board[r][c];
+                    piece.className = `piece ${type === 1 || type === 3 ? 'p1' : 'p2'} ${type >= 3 ? 'king' : ''}`;
+                    if(this.selected && this.selected.r === r && this.selected.c === c) piece.classList.add('selected');
+                    piece.onclick = (e) => { e.stopPropagation(); this.selectPiece(r, c); };
+                    sq.appendChild(piece);
+                }
+                sq.onclick = () => { if(move) this.executeMove(move); };
+                boardEl.appendChild(sq);
+            }
+        }
+        document.getElementById('c-turn').innerText = "P" + this.turn;
+        document.getElementById('c-turn').style.color = this.turn === 1 ? '#ef4444' : '#e2e8f0';
+    },
+
+    selectPiece(r, c) {
+        if(this.isAI && this.turn === 2) return; 
+        
+        const p = this.board[r][c];
+        
+        if((this.turn === 1 && (p===1||p===3)) || (this.turn === 2 && (p===2||p===4))) {
+            this.selected = {r, c};
+            this.validMoves = this.getMoves(r, c, this.board);
+            
+            if(this.forceJumps) {
+                const allCaptures = this.getAllCaptures(this.turn, this.board);
+                if(allCaptures.length > 0) {
+                    this.validMoves = this.validMoves.filter(m => m.isCap);
+                }
+            }
+            this.render();
+        }
+    },
+
+    getMoves(r, c, board, capsOnly = false) {
+        const p = board[r][c];
+        const moves = [];
+        const dirs = [];
+        
+        if(p === 1 || p === 3 || p === 4) dirs.push([-1, -1], [-1, 1]);
+        if(p === 2 || p === 3 || p === 4) dirs.push([1, -1], [1, 1]); 
+
+        for(let [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc;
+            const jr = r + 2*dr, jc = c + 2*dc;
+
+            if(jr >= 0 && jr < 8 && jc >= 0 && jc < 8 && board[jr][jc] === 0) {
+                const mid = board[nr][nc];
+                if(mid !== 0 && !this.isOwnPiece(mid, this.getPlayer(p))) {
+                    moves.push({r: jr, c: jc, isCap: true, capR: nr, capC: nc});
+                }
+            }
+            
+            if(!capsOnly && nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === 0) {
+                moves.push({r: nr, c: nc, isCap: false});
+            }
+        }
+        return moves;
+    },
+
+    isOwnPiece(p, turn) { return (turn === 1) ? (p === 1 || p === 3) : (p === 2 || p === 4); },
+    getPlayer(p) { return (p === 1 || p === 3) ? 1 : 2; },
+
+    getAllCaptures(player, board) {
+        const caps = [];
+        for(let r = 0; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                if(this.isOwnPiece(board[r][c], player)) {
+                    const m = this.getMoves(r, c, board, true);
+                    if(m.some(move => move.isCap)) caps.push({r, c});
+                }
+            }
+        }
+        return caps;
+    },
+
+    executeMove(move) {
+        const {r, c} = this.selected;
+        let p = this.board[r][c];
+
+        this.board[move.r][move.c] = p;
+        this.board[r][c] = 0;
+
+        if(move.isCap) {
+            this.board[move.capR][move.capC] = 0;
+            
+            const nextCaps = this.getMoves(move.r, move.c, this.board, true);
+            if(nextCaps.length > 0) {
+                this.selected = {r: move.r, c: move.c};
+                this.validMoves = nextCaps;
+                this.render();
+                
+                if(this.isAI && this.turn === 2) {
+                    setTimeout(() => {
+                        const nextMove = this.validMoves[Math.floor(Math.random() * this.validMoves.length)];
+                        this.executeMove(nextMove);
+                    }, 500);
+                }
+                return;
+            }
+        }
+
+        if(move.r === 0 && p === 1) this.board[move.r][move.c] = 3;
+        if(move.r === 7 && p === 2) this.board[move.r][move.c] = 4;
+
+        this.turn = this.turn === 1 ? 2 : 1;
+        this.selected = null;
+        this.validMoves = [];
+        this.render();
+        this.checkGameOver();
+
+        if(this.turn === 2 && this.isAI) {
+            setTimeout(() => this.aiMove(), 600);
+        }
+    },
+
+    aiMove() {
+        const allPieces = [];
+        for(let r = 0; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                if(this.isOwnPiece(this.board[r][c], 2)) allPieces.push({r, c});
+            }
+        }
+
+        let possibleMoves = [];
+        allPieces.forEach(p => {
+            const ms = this.getMoves(p.r, p.c, this.board);
+            ms.forEach(m => possibleMoves.push({from: p, to: m}));
+        });
+
+        const caps = possibleMoves.filter(m => m.to.isCap);
+        if(caps.length > 0 && this.forceJumps) {
+            possibleMoves = caps;
+        }
+
+        if(possibleMoves.length === 0) return this.checkGameOver();
+
+        const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        this.selected = move.from;
+        this.executeMove(move.to);
+    },
+
+    checkGameOver() {
+        let p1 = 0, p2 = 0;
+        this.board.flat().forEach(p => { if(p === 1 || p === 3) p1++; if(p === 2 || p === 4) p2++; });
+        if(p1 === 0) setTimeout(() => alert("Player 2 Wins 🏆!"), 100);
+        if(p2 === 0) setTimeout(() => alert("Player 1 Wins 🏆!"), 100);
+    }
+};
+
+/**
+* ============================================================================================
+* GAME: HANGMAN (Dynamic Large Dictionary)
+* ============================================================================================
+*/
+const Hangman = {
+    dict: {
+        4: ["ABLE","ACID","ATOM","AURA","AXIS","BABY","BAKE","BALD","BARK","BASS","BEAM","BEAR","BELL","BIRD","BLUE","BOAT","BOLD","BONE","BOOK","BOOM","BOWL","BURN","CAKE","CALM","CAMP","CARE","CASH","CAST","CAVE","CHEF","CITY","CLAW","CLIP","CLUB","COAL","CODE","COIN","COLD","CORE","CORN","CRAB","CREW","CROP","CURE","CUTE","DART","DASH","DATA","DAWN","DEAL","DECK","DEEP","DEER","DESK","DIAL","DICE","DIET","DIRT","DISK","DIVE","DOCK","DOOR","DOSE","DRAW","DROP","DRUM","DUCK","DUST","ECHO","EDGE","EDIT","EPIC","EVIL","EXIT","FACE","FACT","FADE","FAIL","FAIR","FALL","FARM","FAST","FEAR","FEEL","FILE","FILM","FIRE","FISH","FLAG","FLAT","FLOW","FOLD","FOOD","FOOL","FORK","FORM","FREE","FROG","FUEL","FUND","GAME","GATE","GEAR","GIFT","GIRL","GLAD","GLOW","GOAL","GOLD","GOLF","GOOD","GRAB","GRID","GRIP","GROW","GULF","HAIR","HALF","HALL","HAND","HARD","HATE","HEAD","HEAT","HERO","HIDE","HIGH","HILL","HINT","HOLD","HOLE","HOME","HOPE","HORN","HOST","HOUR","HUNT","IDEA","IDOL","IRON","ITEM","JAZZ","JOIN","JOKE","JUMP","JURY","KEEP","KICK","KILL","KIND","KING","KISS","KITE","KNEE","KNOT","LACK","LADY","LAKE","LAMP","LAND","LANE","LAST","LATE","LEAD","LEAF","LEAN","LEAP","LEFT","LENS","LESS","LIFE","LIFT","LIKE","LINE","LINK","LION","LIPS","LIST","LIVE","LOAD","LOAN","LOCK","LOGO","LONG","LOOK","LOOP","LORD","LOST","LOVE","LUCK","LUMP","LUNG","MAKE","MALE","MALL","MARK","MASK","MASS","MATE","MATH","MEAL","MEAT","MEET","MELT","MENU","MERE","MILK","MIND","MINE","MINT","MISS","MODE","MOOD","MOON","MORE","MOST","MOVE","MUCH","MUST","MYTH","NAME","NAVY","NEAR","NECK","NEED","NEST","NEWS","NEXT","NICE","NINE","NODE","NONE","NOON","NORM","NOSE","NOTE","NOUN","NULL","OATH","OBEY","OPEN","ORAL","OVEN","OVER","PACE","PACK","PAGE","PAIN","PAIR","PALM","PARK","PART","PASS","PAST","PATH","PEAK","PEAR","PEER","PILL","PINE","PINK","PIPE","PLAN","PLAY","PLOT","PLUG","PLUS","POEM","POET","POLE","POOL","POOR","PORT","POST","POUR","PRAY","PULL","PUMP","PURE","PUSH","QUIT","RACE","RACK","RAIN","RARE","RATE","READ","REAL","REAR","RELY","RENT","REST","RICE","RICH","RIDE","RING","RISE","RISK","ROAD","ROCK","ROLE","ROLL","ROOF","ROOM","ROOT","ROSE","RUIN","RULE","RUSH","SAFE","SAIL","SALE","SALT","SAME","SAND","SAVE","SCAN","SEAT","SEED","SEEK","SELL","SEND","SHIP","SHOE","SHOP","SHOT","SHOW","SICK","SIDE","SIGN","SILK","SING","SINK","SITE","SIZE","SKIN","SKIP","SLIP","SLOW","SNOW","SOAP","SOFT","SOIL","SOLD","SOME","SONG","SOON","SORT","SOUL","SOUP","SPIN","STAR","STAY","STEP","STOP","SUIT","SURE","SWIM","SYNC","TALL","TANK","TAPE","TASK","TEAM","TEAR","TELL","TENT","TERM","TEST","TEXT","THAT","THEM","THEN","THEY","THIN","THIS","TICK","TIDE","TIME","TINY","TIRE","TOAD","TOMB","TONE","TOOL","TOUR","TOWN","TREE","TRIP","TRUE","TUBE","TUNE","TWIN","TYPE","UGLY","UNIT","UPON","URGE","USER","VAST","VEIN","VEST","VICE","VIEW","VOID","VOTE","WAGE","WAIT","WAKE","WALK","WALL","WANT","WARD","WARM","WASH","WAVE","WEAK","WEAR","WEED","WEEK","WELL","WEST","WHAT","WHEN","WHIP","WIDE","WIFE","WILD","WILL","WIND","WINE","WING","WIRE","WISE","WISH","WOLF","WOOD","WOOL","WORD","WORK","WORM","WRAP","YARD","YARN","YEAR","YOUR","ZERO","ZONE"],
+        5: ["ABOVE","ACTOR","ACUTE","ADAPT","ADMIT","ADOPT","ADULT","AFTER","AGAIN","AGENT","ALARM","ALBUM","ALERT","ALIEN","ALIVE","ALLOW","ALONE","ALPHA","ALTER","AMONG","ANGER","ANGLE","ANGRY","APPLE","APPLY","ARENA","ARGUE","ARISE","ARRAY","ARROW","ASSET","AUDIO","AVOID","AWAKE","AWARE","BADGE","BAKER","BASIC","BASIS","BEACH","BEAST","BEGIN","BEING","BELLY","BELOW","BENCH","BERRY","BINGO","BIRTH","BLACK","BLAME","BLANK","BLAST","BLEND","BLESS","BLIND","BLOCK","BLOOD","BOARD","BOAST","BONUS","BOOST","BOUND","BRAIN","BRAVE","BREAD","BREAK","BRICK","BRIEF","BRING","BROAD","BROWN","BRUSH","BUILD","BUNCH","BUYER","CABIN","CABLE","CATCH","CAUSE","CHAIN","CHAIR","CHALK","CHAMP","CHANT","CHARM","CHART","CHASE","CHEAP","CHEAT","CHECK","CHEST","CHIEF","CHILD","CHILL","CHOIR","CIVIL","CLAIM","CLASS","CLEAN","CLEAR","CLERK","CLICK","CLOCK","CLOSE","CLOUD","COACH","COAST","COMIC","CORAL","COUNT","COURT","COVER","CRAFT","CRASH","CRAZY","CREAM","CRIME","CROSS","CROWD","CROWN","CRUEL","CRUSH","CURVE","CYCLE","DAILY","DANCE","DEATH","DELAY","DEPTH","DEVIL","DIARY","DIRTY","DISCO","DONOR","DOUBT","DRAFT","DRAMA","DREAM","DRESS","DRIFT","DRILL","DRINK","DRIVE","EAGER","EARLY","EARTH","EIGHT","ELITE","EMPTY","ENEMY","ENJOY","ENTER","EQUAL","ERROR","EVENT","EXACT","EXIST","EXTRA","FAINT","FAITH","FALSE","FAULT","FEAST","FENCE","FIELD","FIGHT","FINAL","FLAME","FLASH","FLEET","FLESH","FLOAT","FLOCK","FLOOR","FLUID","FOCUS","FORCE","FORGE","FORUM","FOUND","FRAME","FRESH","FRONT","FROST","FRUIT","FUNNY","GHOST","GIANT","GIVEN","GLASS","GLOBE","GLORY","GRACE","GRAND","GRANT","GRASS","GREAT","GREEN","GREET","GRIEF","GROUP","GUARD","GUESS","GUEST","GUIDE","HABIT","HAPPY","HARSH","HEART","HEAVY","HELLO","HONEY","HONOR","HORSE","HOTEL","HOUSE","HUMAN","HUMOR","HURRY","IDEAL","IMAGE","IMPLY","INDEX","INNER","INPUT","ISSUE","JOINT","JUDGE","JUICE","KNOWN","LABEL","LABOR","LARGE","LASER","LATER","LAUGH","LAYER","LEARN","LEAVE","LEGAL","LEMON","LEVEL","LIGHT","LIMIT","LOCAL","LOGIC","LOOSE","LOYAL","LUCKY","LUNCH","MAGIC","MAJOR","MAKER","MANGO","MARCH","MATCH","MAYOR","MEANT","MEDAL","MERIT","METAL","METER","MICRO","SMILE"],
+        6: ["ABSORB","ACCEPT","ACCESS","ACTION","ACTIVE","ADJUST","ADVICE","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","APPEAR","AROUND","ARRIVE","ARTIST","ASPECT","ASSESS","ASSUME","ATTACK","AUTHOR","AVENUE","BACKUP","BALLET","BANANA","BANKER","BASKET","BATTLE","BEAUTY","BECOME","BEFORE","BEHALF","BEHIND","BELIEF","BELONG","BEYOND","BISHOP","BITTER","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIGHT","BROKEN","BUBBLE","BUDGET","BUREAU","BUTTON","CAMERA","CAMPUS","CANCEL","CANCER","CANDLE","CANVAS","CARBON","CAREER","CAREFUL","CARING","CARPET","CASUAL","CATTLE","CENTER","CHANCE","CHANGE","CHARGE","CHEESE","CHERRY","CHOICE","CHOOSE","CHORUS","CHURCH","CIRCLE","CLIENT","CLINIC","CLOSET","COFFEE","COLLAR","COLUMN","COMEDY","COMMON","COMPEL","CONVEY","CORNER","CORPUS","COSMIC","COTTON","COUPLE","COUPON","COURSE","COUSIN","CRAFTS","CREATE","CREDIT","CRISIS","CUSTOM","DAMAGE","DANGER","DARING","DEBATE","DECADE","DECIDE","DEFEND","DEFINE","DEGREE","DEMAND","DEPEND","DEPUTY","DESERT","DESIGN","DESIRE","DETAIL","DETECT","DEVICE","DEVOTE","DIFFER","DINNER","DIRECT","DIVIDE","DOCTOR","DOLLAR","DOMAIN","DOUBLE","DRAGON","DREAMY","DRIVER","DURING","EASILY","EATING","EDITOR","EFFECT","EFFORT","EIGHTH","EITHER","ELEVEN","EMERGE","EMPIRE","EMPLOY","ENERGY","ENGINE","ENOUGH","ENSURE","ENTIRE","ENTITY","ESCAPE","ESTATE","ETHICS","EXCUSE","EXPERT","EXPORT","EXTEND","EXTENT","FABRIC","FACING","FACTOR","FAILED","FAMILY","FAMOUS","FARMER","FATHER","FELLOW","FEMALE","FIERCE","FIGURE","FILLING","FILTER","FINISH","FISCAL","FLAVOR","FLIGHT","FLOWER","FLYING","FOREST","FORMAL","FORMAT","FORMER","FOSTER","FOURTH","FRIEND","FUTURE","GALAXY","GALLON","GARDEN","GATHER","GENDER","GENIUS","GENTLE","GLOBAL","GOLDEN","GOSPEL","GROWTH","GUILTY","GUITAR","HANDLE","HAPPEN","HARBOR","HARDLY","HEALTH","HEAVEN","HEIGHT","HEROIC","HIDDEN","HIGHLY","HOLLOW","HONEST","HONOUR","HORROR","HUNTER","IGNORE","ILLUDE","IMPACT","IMPORT","INCOME","INDOOR","INJURY","INSECT","INSERT","INSIDE","INTEND","INTENT","INVENT","INVEST","ISLAND","ITSELF","JACKET","JERSEY","JUNGLE","JUNIOR","KEEPER","KICKER","KIDNEY","KILLER","KNIGHT","LADIES","LATEST","LAUNCH","LAWYER","LEADER","LEAGUE","LEAVES","LEGACY","LENGTH","LESSON","LETTER","LIQUID","LISTEN","LITTLE","LIVING","LOCATE","LOGICAL","LONELY","LOUNGE","LOVELY","MAKING","MANAGE","MANNER","MANUAL","MARGIN","MARKET","MARVEL","MASTER","MATRIX","MATTER","MAYORE","MEMORY","MENTAL","METHOD","MIDDLE","MINUTE","MIRROR","MOBILE","MODERN","MODEST","MODULE","MOMENT","MONKEY","MOTHER","MOTION","MOTIVE","MURDER","MUSCLE","MUSEUM","MUTUAL","MYSTIC","NATION","NATURE","NEAREY","NEARLY","NOBODY","NORMAL","NOTICE","NUMBER","OBJECT","OBTAIN","OFFICE","ONLINE","OPTION","ORANGE","ORIGIN","OUTPUT","OXYGEN","PALACE","PARADE","PARENT","PARISH","PARLOR","PARTLY","PASTOR","PATENT","PATROL","PATRON","PEANUT","PEPPER","PERIOD","PERMIT","PERSON","PHRASE","PHYSIC","PICKUP","PILLAR","PLANET","PLASMA","PLAYER","PLEASE","PLEDGE","PLENTY","POCKET","POETRY","POISON","POLICE","POLICY","POLISH","POLITE","PONDER","PORTAL","POSTER","POTATO","POWDER","PRAYER","PREFER","PRETTY","PRIEST","PRINCE","PRISON","PROFIT","PROMPT","PROPER","PROVEN","PUBLIC","PURSUIT","PUZZLE","QUARTZ","RABBIT","RACISM","RADIUS","RANDOM","RATHER","RATING","READER","REALITY","REASON","RECALL","RECENT","RECORD","REDUCE","REFORM","REFUSE","REGARD","REGION","RELATE","RELIEF","REMAIN","REMOTE","REMOVE","REPAIR","REPEAT","REPLY","REPORT","RESCUE","RESIGN","RESIST","RESORT","RESULT","RETAIL","RETAIN","RETURN","REVEAL","REVIEW","REWARD","RHYTHM","RIBBON","RIDDLE","RIDING","RITUAL","ROBUST","ROCKET","ROLLER","ROMANCE","RUBBER","RULING","SACRED","SAFETY","SAILOR","SALARY","SAMPLE","SAVAGE","SAVING","SCARCE","SCHEME","SCHOOL","SCREEN","SCRIPT","SEARCH","SEASON","SECOND","SECRET","SECTOR","SECURE","SELDOM","SELECT","SENATE","SENIOR","SENSOR","SERIAL","SERVER","SETTLE","SEVERE","SEXUAL","SHADOW","SHARED","SHELTER","SHIELD","SIGNAL","SILENT","SILVER","SIMPLE","SINGER","SINGLE","SISTER","SKETCH","SLEEVE","SLIGHT","SMOOTH","SOCIAL","SOCIETY","SOCKET","SOLAR","SOLDIE","SOLID","SORROW","SOURCE","SOVIET","SPEECH","SPIDER","SPIRIT","SPLEND","SPONGE","SPOUSE","SPREAD","SPRING","SQUARE","STABLE","STATUS","STEADY","STRAIN","STREAM","STREET","STRESS","STRICT","STRIKE","STRING","STRONG","STUDIO","STUPID","SUBMIT","SUDDEN","SUFFER","SUMMER","SUMMIT","SUNSET","SUPERB","SUPPER","SUPPLY","SURELY","SURVEY","SWITCH","SYMBOL","SYSTEM","TABLET","TACKLE","TAILOR","TALENT","TARGET","TASTES","TAVERN","TEMPER","TENNIS","TERROR","THANK","THEORY","THINGS","THIRTY","THREAD","THREAT","THRILL","TICKET","TIMBER","TISSUE","TOILET","TOMATO","TONGUE","TOPIC","TOXIN","TRAGIC","TRAUMA","TRAVEL","TREATY","TRENDY","TROOP","TUMOR","TUNNEL","TURKEY","TWELVE","TWENTY","TYPICAL","UNABLE","UNIQUE","UNLESS","UNLIKE","UPDATE","UPWARD","USEFUL","UTMOST","VACANT","VALLEY","VANISH","VARIETY","VECTOR","VELVET","VENDOR","VENUE","VERBAL","VERIFY","VESSEL","VICTIM","VISION","VISUAL","VOLUME","VOWEL","VOYAGE","WALNUT","WANDER","WEALTH","WEAPON","WEAVER","WEEKLY","WEIGHT","WINDOW","WINTER","WISDOM","WIZARD","WONDER","WORKER","WORTHY","WRITER","YELLOW","YIELD","ZOMBIE"],
+        7: ["ABILITY","ABSENCE","ACADEMY","ACCOUNT","ACHIEVE","ACQUIRE","ADDRESS","ADVANCE","ADVERSE","ADVISOR","AGAINST","AIRPORT","ALCOHOL","ALLEGED","ALREADY","ANALYST","ANCIENT","ANOTHER","ANXIETY","ANYBODY","ANYMORE","ANYTHING","ANYWAY","APPAREL","APPEAL","APPLIED","ARCHIVE","ARTICLE","ASSAULT","ASSUME","ATTEMPT","ATTRACT","AUCTION","AVERAGE","AWESOME","BACKING","BALANCE","BANKING","BARGAIN","BATTERY","BEARING","BECAUSE","BEDROOM","BELIEVE","BENEATH","BENEFIT","BESIDES","BETWEEN","BINDING","BLANKET","BOMBING","BOOKING","BOUNDS","CABINET","CALIBER","CALLING","CAPABLE","CAPITAL","CAPTAIN","CARRIER","CASHIER","CASTING","CATALOG","CEILING","CENTRAL","CENTURY","CERTAIN","CHAMBER","CHANNEL","CHAPTER","CHARITY","CHARLIE","CHARTER","CHECKER","CHICKEN","CHRONIC","CIRCUIT","CLASSES","CLASSIC","CLIMATE","CLINIC","CLOSING","CLOSURE","CLOTHES","COASTAL","COLLEGE","COMMAND","COMMENT","COMPACT","COMPANY","COMPARE","COMPLEX","CONCEPT","CONCERN","CONCERT","CONDUCT","CONFIRM","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","COOKING","COUNCIL","COUNSEL","COUNTER","COUNTRY","CRUCIAL","CRYSTAL","CULTURE","CURRENT","CUTTING","DAMAGES","DANCING","DECADES","DECLINE","DEFAULT","DEFENSE","DEFICIT","DELIVER","DENSITY","DEPOSIT","DESCENT","DESIRES","DESKTOP","DESTINY","DESTROY","DEVELOP","DIAMOND","DICTION","DIGITAL","DILEMMA","DINING","DIPLOMA","DISCUSS","DISEASE","DISMISS","DISPLAY","DISPUTE","DIVIDED","DIVORCE","DRIVING","DYNAMIC","EARNING","ECLIPSE","ECONOMY","EDITION","EDUCATE","EFFECTS","ELASTIC","ELEMENT","EMOTION","EMPATHY","EMPRESS","ENDLESS","ENFORCED","ENGLISH","ENHANCE","ENTRYS","EPISODE","EQUALLY","EVENING","EVIDENT","EXACTLY","EXAMINE","EXAMPLE","EXCITED","EXCLUDE","EXHIBIT","EXPENSE","EXPLAIN","EXPLORE","EXPRESS","EXTREME","FACTORY","FACULTY","FAILING","FAILURE","FALLING","FANTASY","FARMING","FASHION","FEATURE","FEDERAL","FEELING","FICTION","FIFTEEN","FILTERS","FINANCE","FINDING","FISHING","FITNESS","FITTING","FIXATED","FIXTURE","FLAVORS","FLIGHTS","FOLDING","FOOTING","FOREIGN","FOREVER","FORMULA","FORTUNE","FORWARD","FOUNDER","FRAUDUL","FREEDOM","FUNDING","FUNERAL","FURNACE","GALAXY","GALLERY","GARBAGE","GARMENT","GATEWAY","GENERAL","GENESIS","GENETIC","GENUINE","GHOSTLY","GLACIER","GLAMOUR","GLASSES","GLIMPSE","GLOSING","GODDESS","GOODBYE","GORILLA","GRANITE","GRAVITY","GROCERY","GROWING","HABITAT","HALFWAY","HANDFUL","HANDLES","HANGING","HARVEST","HEALTHY","HEARING","HEATING","HEAVIER","HELPFUL","HERITAGE","HEROICS","HIDEAWY","HILARIC","HISTORY","HOLDING","HOLIDAY","HONESTY","HOPEFUL","HORIZON","HOSTAGE","HOSTILE","HOUSING","HUNDRED","HUNTING","HUSBAND","ILLEGAL","ILLNESS","ILLUSION","IMAGINE","IMAGING","IMMENSE","IMPERIA","IMPLIES","IMPORTS","IMPROVE","INCLUDE","INCOME","INDOORS","INDUSTRY","INFANTS","INITIAL","INJURED","INQUIRY","INSIGHT","INSPIRE","INSTALL","INSTANT","INSTEAD","INTENSE","INTERIM","INVOLVE","ISOLATE","JOURNAL","JOURNEY","JUSTICE","JUSTIFY","KEEPING","KITCHEN","KNOWING","LANDING","LARGELY","LASTING","LEADING","LEAFLET","LEAKAGE","LEANING","LEARNED","LEATHER","LEAVING","LECTURE","LEGENDS","LEISURE","LETTERS","LIBERTY","LIBRARY","LICENSE","LIFTING","LIMITS","LOGICAL","LOOKING","LOYALTY","MACHINE","MADNESS","MAGICAL","MAGNETS","MAILING","MAINTAI","MAJESTY","MAKING","MALARIA","MANAGER","MANDATE","MANKIND","MANNERS","MANSION","MANUALS","MARGINS","MARRIED","MARTIAL","MASSIVE","MASTERS","MATCHES","MAXIMUM","MEANING","MEASURE","MEDICAL","MEETING","MELODYS","MEMBERS","MINERAL","MINIMUM","MIRACLE","MIRRORS","MISSING","MISSION","MISTAKE","MIXTURE","MOBILE","MONARCH","MONITOR","MONSTER","MORNING","MORTALS","MOTIONS","MOTIVES","MOUNTAIN","MOVABLE","MURDERS","MUSCULAR","MUSICAL","MYSTERY","NATURAL","NEAREST","NETWORK","NEUTRAL","NOTABLE","NOTHING","NOVELTY","NUCLEAR","NUMBERS","NURSERY","NURSING","OAKLAND","OBJECTS","OBSERVE","OBVIOUS","OFFENSE","OFFICER","OFFICES","ONGOING","OPENING","OPERATE","OPINION","OPTICAL","OPTIONS","ORANGES","ORBITAL","ORGANIC","ORIGINS","OUTCOME","OUTDOOR","OUTFITS","OUTLINE","OUTLOOK","OUTSIDE","PACIFIC","PACKAGE","PAINTED","PAINTER","PAJAMAS","PALETTE","PANCAKE","PANELIS","PANTHER","PARADOX","PARENTS","PARKING","PARTIAL","PARTNER","PASSAGE","PASSION","PATENTS","PATIENT","PATTERN","PAYMENT","PENALTY","PENSION","PEOPLES","PERFECT","PERFORM","PERIODS","PERMITS","PERSONS","PHANTOM","PHARMAC","PHRASES","PHYSICS","PICKING","PICTURE","PIONEER","PIPELIN","PIRATES","PITCHER","PLACING","PLANETS","PLANNED","PLASTIC","PLAYERS","PLAYING","POCKETS","POINTER","POLICEY","POLITIC","POPULAR","PORTION","PORTRAI","POVERTY","POWDERS","POWERED","PRACTIC","PRAISED","PRECEDE","PREDICT","PREMIER","PREMISE","PREMIUM","PREPARE","PRESCOT","PRESENT","PREVENT","PRIMARY","PRINCES","PRINTED","PRINTER","PRIVACY","PRIVATE","PROBLEM","PROCEED","PROCESS","PRODUCE","PRODUCT","PROFILE","PROFITS","PROGRAM","PROJECT","PROMISE","PROMOTE","PROPHET","PROTECT","PROTEIN","PROTEST","PROVIDE","PROVINCE","PUBLISH","PULLING","PURPOSE","PUSHING","PUTTING","QUALITY","QUANTUM","QUARTER","QUEENLY","QUERIES","QUIETLY","RABBITS","RADICAL","RADIO","RAILWAY","RAINBOW","RAISING","RALLIES","RAMBLER","RANCHO","RANDOMS","RANGING","RANKING","RAPIDLY","RATINGS","REACHES","READING","REALITY","REALIZE","REASONS","RECEIPT","RECEIVE","RECIPES","RECORDS","RECOVER","RECRUIT","REDUCED","REFEREE","REFLECT","REFORMS","REFUGEE","REGULAR","RELATED","RELEASE","REMAINS","REMARKS","REMEDY","REMOVAL","REMOVED","REPLACE","REPORTS","REQUEST","REQUIRE","RESCUED","RESERVE","RESOLVE","RESPECT","RESPOND","RESTORE","RESULTS","RESUMES","RETAILS","RETIRED","RETREAT","REVENUE","REVIEWS","REWARDS","RHYTHMS","RIBBONS","RIDING","RIGHTLY","RINGING","RITUALS","ROBBERS","ROCKETS","ROLLING","ROMANCE","ROMANTIC","ROOFTOP","ROUTINE","ROYALTY","RUBBERS","RUINING","RULINGS","RUNNERS","RUNNING","SADDLES","SAFARI","SAILING","SAILORS","SALESMA","SAMPLES","SANDALS","SATISFY","SAVAGE","SAVINGS","SCANDAL","SCANNED","SCARLET","SCENARI","SCHOLAR","SCHOOLS","SCIENCE","SCREENS","SCRIPTS","SEATING","SECONDS","SECRETS","SECTION","SECTORS","SECURED","SEEKING","SEGMENT","SEISMIC","SELLERS","SELLING","SENATOR","SENDING","SENSORS","SERIOUS","SERVANT","SERVERS","SERVICE","SESSION","SETTING","SEVENTH","SEVERAL","SHADOWS","SHARING","SHELTER","SHIELDS","SHIPPED","SHOCKING","SHOOTING","SHORTLY","SHOWING","SIBLING","SIGNALS","SIGNING","SILENCE","SILICONE","SIMILAR","SINGING","SINGLES","SISTERS","SITTING","SITUATE","SKATING","SKILLS","SKILLFUL","SLEEPING","SLIDING","SLIPPED","SMOKING","SMUGGLE","SOCIETY","SOCKETS","SOLAR","SOLDIER","SOURCES","SPATIAL","SPEAKER","SPECIAL","SPECIES","SPECIFY","SPECTRE","SPEECHES","SPHERES","SPIDERS","SPIRITS","SPOKEN","SPONSOR","SPREAD","SPRINGS","SQUARES","STADIUM","STAMINA","STANDS","STARTING","STATICS","STATION","STATUES","STAYING","STEREOS","STOMACH","STORAGE","STORIES","STRANGE","STREAMS","STREETS","STRETCH","STRIKES","STRINGS","STROKES","STUDENT","STUDIES","STUDIOS","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUDDEN","SUFFER","SUGGEST","SUICIDE","SUMMERS","SUMMITS","SUNDAY","SUNRISE","SUNSETS","SUPPORT","SUPPOSE","SUPREME","SURFACE","SURGEON","SURGERY","SURPLUS","SURVIVE","SUSPECT","SUSTAIN","SWIMMING","SYMBOLS","SYMPTOMS","SYNTAX","SYSTEMS","TABLETS","TACKLES","TACTICS","TAILORS","TALENTS","TALKING","TALLIES","TARGETS","TAVERNS","TEACHER","TELLERS","TELLING","TEMPERATURE","TENDONS","TENSIONS","TERRORS","TESTING","TEXTURE","THEATER","THEMES","THERAPY","THINKER","THIRSTY","THIRTEEN","THOUGHT","THREADS","THREATS","THRILLS","TICKETS","TIMBER","TISSUES","TITLES","TOBACCO","TOILETS","TOMATOES","TONGUES","TOPICS","TORNADO","TORONTO","TOURISM","TOURIST","TOWARDS","TOWERS","TOXINS","TRACTOR","TRADERS","TRADING","TRAFFIC","TRAGEDY","TRAILER","TRAINED","TRAINER","TRAITS","TRANSIT","TRAUMA","TRAVELS","TREASURY","TREATIES","TREATS","TRILOGY","TRIUMPH","TROPHIES","TROUBLE","TRUCKS","TRUSTEE","TUMORS","TUNNELS","TURKEYS","TURNED","TURNING","TWELFTH","TWENTIES","TWITTER","TYPICAL","UNIFORM","UNKNOWN","UNUSUAL","UPDATED","UPGRADE","UPWARDS","URANIUM","USEABLE","UTILITY","VACANCY","VACCINE","VAMPIRE","VANILLA","VANTAGE","VARIANT","VARIETY","VEHICLE","VENDORS","VENTURE","VERDICT","VERSION","VESSELS","VETERAN","VICTIMS","VICTORY","VILLAGE","VINTAGE","VIOLATE","VIRTUAL","VISIONS","VISITOR","VISUALS","VITAMIN","VOLCANO","VOLUMES","VOTING","VOYAGES","WAITING","WALKING","WALLACE","WARNING","WARRANT","WARRIOR","WASHING","WEALTHY","WEAPONS","WEARERS","WEARING","WEAVERS","WEBSITE","WEDDING","WEEKEND","WEIGHTS","WELCOME","WELFARE","WESTERN","WHISPER","WILLING","WINDOWS","WINNING","WINTERS","WIRING","WISDOMS","WISHES","WITCHES","WITHOUT","WITNESS","WIZARDS","WONDERS","WORKERS","WORKING","WRITERS","WRITING","YELLOW","ZOMBIES"]
+    },
+    wordLen: 'random',
+    word: "",
+    guessed: new Set(),
+    wrong: 0,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Hangman</h1>
+                <p style="color:var(--text-muted)">Guess the hidden word before it's too late</p>
+                <div class="game-controls" style="margin-top:1rem;">
+                    <button class="btn-action btn-secondary ${this.wordLen === 'random' ? 'active':''}" onclick="Hangman.setLength('random')">Auto</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 4 ? 'active':''}" onclick="Hangman.setLength(4)">4 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 5 ? 'active':''}" onclick="Hangman.setLength(5)">5 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 6 ? 'active':''}" onclick="Hangman.setLength(6)">6 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 7 ? 'active':''}" onclick="Hangman.setLength(7)">7 Ltrs</button>
+                </div>
+            </div>
+            <div class="hangman-wrap">
+                <svg class="hangman-svg" viewBox="0 0 100 120">
+                    <line x1="10" y1="110" x2="90" y2="110" class="base-struct" /> 
+                    <line x1="20" y1="110" x2="20" y2="10" class="base-struct" />  
+                    <line x1="20" y1="10" x2="60" y2="10" class="base-struct" />   
+                    <line x1="60" y1="10" x2="60" y2="30" class="base-struct" />   
+                    <circle cx="60" cy="40" r="10" id="h-0" />                   
+                    <line x1="60" y1="50" x2="60" y2="80" id="h-1" />            
+                    <line x1="60" y1="55" x2="45" y2="70" id="h-2" />            
+                    <line x1="60" y1="55" x2="75" y2="70" id="h-3" />            
+                    <line x1="60" y1="80" x2="45" y2="100" id="h-4" />           
+                    <line x1="60" y1="80" x2="75" y2="100" id="h-5" />           
+                </svg>
+                <div class="hangman-word" id="h-display"></div>
+                <div class="hangman-keyboard" id="h-kb"></div>
+            </div>
+            <div class="game-controls">
+                <button class="btn-action btn-secondary" onclick="Hangman.init(document.getElementById('game-content'))">New Word</button>
+            </div>
+        `;
+        
+        this.generateWord();
+        this.guessed.clear();
+        this.wrong = 0;
+        this.renderWord();
+        this.renderKB();
+    },
+
+    setLength(len) {
+        this.wordLen = len;
+        this.init(document.getElementById('game-content'));
+    },
+
+    generateWord() {
+        let targetLen = this.wordLen;
+        if(targetLen === 'random') {
+            targetLen = Math.floor(Math.random() * 4) + 4;
+        }
+        
+        const possibleWords = this.dict[targetLen];
+        this.word = possibleWords[Math.floor(Math.random() * possibleWords.length)];
+    },
+
+    renderWord() {
+        const display = this.word.split('').map(char => this.guessed.has(char) ? char : '_').join('');
+        document.getElementById('h-display').innerText = display;
+        if(!display.includes('_')) {
+            setTimeout(() => alert("You Win 🏆! The word was: " + this.word), 100);
+        }
+    },
+
+    renderKB() {
+        const kb = document.getElementById('h-kb');
+        kb.innerHTML = '';
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(char => {
+            const btn = document.createElement('div');
+            btn.className = 'key';
+            btn.innerText = char;
+            btn.onclick = () => this.guess(char, btn);
+            kb.appendChild(btn);
+        });
+    },
+
+    guess(char, btn) {
+        if(this.guessed.has(char) || this.wrong >= 6) return;
+        
+        this.guessed.add(char);
+        btn.classList.add('disabled');
+
+        if(this.word.includes(char)) {
+            btn.classList.add('correct');
+            this.renderWord();
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById(`h-${this.wrong}`).classList.add('visible');
+            this.wrong++;
+            
+            if(this.wrong >= 6) {
+                setTimeout(() => alert("Game Over 💀! The word was: " + this.word), 100);
+            }
+        }
+    }
+};
+
+// ============================================================================================
+// BOOTSTRAP INITIALIZATION
+// ============================================================================================
+window.onload = () => {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    window.addEventListener('resize', () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
+};
+</script>
+</body>
+</html>
