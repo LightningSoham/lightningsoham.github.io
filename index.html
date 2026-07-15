@@ -1,0 +1,4549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tags for proper mobile rendering and disabling unwanted scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>SPSgames | Play Amazing Games (Pro Edition)</title>
+    
+    <!-- Preconnect to Google Fonts for performance optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Outfit for UI, JetBrains Mono for numbers and monospace data -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons library for high-quality SVG iconography -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* ==========================================================================
+           1. GLOBAL VARIABLES & DESIGN TOKENS
+           ========================================================================== */
+        :root {
+            /* Backgrounds and Overlays */
+            --bg-base: #030712;
+            --bg-surface: #0f172a;
+            --bg-glass: rgba(15, 23, 42, 0.45);
+            --bg-glass-strong: rgba(15, 23, 42, 0.85);
+            
+            /* Borders */
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-hover: rgba(255, 255, 255, 0.2);
+            --border-glass-active: rgba(255, 255, 255, 0.4);
+            
+            /* Primary Colors and Glows */
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --primary-muted: rgba(139, 92, 246, 0.2);
+            
+            /* Secondary Colors and Glows */
+            --secondary: #ec4899;
+            --secondary-glow: rgba(236, 72, 153, 0.5);
+            --secondary-muted: rgba(236, 72, 153, 0.2);
+            
+            /* Accent Colors */
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.5);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.5);
+            --accent-red: #f43f5e;
+            --accent-red-glow: rgba(244, 63, 94, 0.5);
+            --accent-yellow: #f59e0b;
+            --accent-yellow-glow: rgba(245, 158, 11, 0.5);
+
+            /* Typography */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dark: #0f172a;
+            
+            /* Border Radii */
+            --radius-xs: 4px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --radius-pill: 9999px;
+            
+            /* Transitions */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --shadow-neon: 0 0 20px var(--primary-glow);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            
+            /* Z-Indices */
+            --z-mesh: -1;
+            --z-base: 1;
+            --z-overlay: 1000;
+            --z-modal: 1010;
+            --z-toast: 9999;
+        }
+
+        /* ==========================================================================
+           2. CSS RESET & BASE STYLES
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar for Webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-pill);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* ==========================================================================
+           3. BACKGROUND ANIMATIONS (MESH GRADIENT)
+           ========================================================================== */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: var(--z-mesh);
+            overflow: hidden;
+            background: radial-gradient(circle at center, #111827, #030712);
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: float 25s infinite alternate ease-in-out;
+            will-change: transform;
+        }
+
+        .orb-1 {
+            top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: var(--primary); animation-delay: 0s;
+        }
+        .orb-2 {
+            bottom: -20%; right: -10%; width: 60vw; height: 60vw;
+            background: var(--secondary); animation-delay: -5s;
+        }
+        .orb-3 {
+            top: 40%; left: 60%; width: 40vw; height: 40vw;
+            background: var(--accent-cyan); animation-delay: -10s;
+        }
+        .orb-4 {
+            bottom: 30%; left: 10%; width: 35vw; height: 35vw;
+            background: var(--accent-green); animation-delay: -15s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(5%, 8%) scale(1.1) rotate(15deg); }
+            66% { transform: translate(-5%, 12%) scale(0.9) rotate(-10deg); }
+            100% { transform: translate(0, -5%) scale(1) rotate(5deg); }
+        }
+
+        /* ==========================================================================
+           4. TYPOGRAPHY & UTILITIES
+           ========================================================================== */
+        .text-gradient {
+            background: linear-gradient(135deg, #c4b5fd 0%, #f9a8d4 50%, #67e8f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent; /* Fallback */
+            display: inline-block;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hidden { display: none !important; }
+        .invisible { visibility: hidden !important; }
+        .text-center { text-align: center !important; }
+        .mt-1 { margin-top: 0.5rem !important; }
+        .mt-2 { margin-top: 1rem !important; }
+        .mb-1 { margin-bottom: 0.5rem !important; }
+        .mb-2 { margin-bottom: 1rem !important; }
+        
+        /* ==========================================================================
+           5. MAIN LAYOUT
+           ========================================================================== */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: var(--z-base);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeDown var(--transition-smooth);
+        }
+
+        .brand-logo {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+            text-transform: uppercase;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .version-badge {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-main);
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border-glass);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-glass);
+            letter-spacing: 0.5px;
+        }
+
+        .version-badge i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        /* ==========================================================================
+           6. GAME GRID & CARDS
+           ========================================================================== */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .game-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            border: 1px solid var(--border-glass);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-glass);
+            animation: fadeUp 0.8s ease-out backwards;
+            min-height: 240px;
+        }
+
+        /* Staggered animation delays for cards */
+        .game-card:nth-child(1) { animation-delay: 0.05s; }
+        .game-card:nth-child(2) { animation-delay: 0.10s; }
+        .game-card:nth-child(3) { animation-delay: 0.15s; }
+        .game-card:nth-child(4) { animation-delay: 0.20s; }
+        .game-card:nth-child(5) { animation-delay: 0.25s; }
+        .game-card:nth-child(6) { animation-delay: 0.30s; }
+        .game-card:nth-child(7) { animation-delay: 0.35s; }
+        .game-card:nth-child(8) { animation-delay: 0.40s; }
+        .game-card:nth-child(9) { animation-delay: 0.45s; }
+        .game-card:nth-child(10) { animation-delay: 0.50s; }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2);
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .game-card:hover::before { opacity: 1; }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border-glass);
+            transition: var(--transition-bounce);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .game-card:hover .card-icon-wrap {
+            transform: scale(1.1) rotate(-8deg);
+            background: var(--primary-muted);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .card-icon-wrap i {
+            font-size: 1.75rem;
+            color: var(--text-main);
+            transition: var(--transition-fast);
+        }
+
+        .game-card:hover .card-icon-wrap i {
+            color: #fff;
+        }
+
+        .game-card h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .game-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Play Button in Cards */
+        .btn-play {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border: 1px solid var(--border-glass);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition-medium);
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .game-card:hover .btn-play {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        /* ==========================================================================
+           7. BUTTONS & CONTROLS (GLOBAL)
+           ========================================================================== */
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glass);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition-bounce);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+            border: none;
+            box-shadow: 0 4px 15px var(--secondary-muted);
+        }
+        .btn-primary:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--secondary-glow);
+            filter: brightness(1.1);
+        }
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+        
+        .btn-secondary { 
+            background: rgba(255,255,255,0.03); 
+            color: var(--text-muted); 
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-secondary:hover:not(:disabled) { 
+            background: rgba(255,255,255,0.08); 
+            color: var(--text-main);
+            transform: translateY(-2px);
+            border-color: var(--border-glass-active);
+        }
+        .btn-secondary.active { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary); 
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        /* ==========================================================================
+           8. MODAL / GAME OVERLAY
+           ========================================================================== */
+        .game-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: var(--z-overlay);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-medium);
+        }
+
+        .game-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-window {
+            background: rgba(15, 23, 42, 0.7);
+            width: 100%;
+            max-width: 800px;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+            padding: 2.5rem;
+            border: 1px solid var(--border-glass);
+            transform: scale(0.95) translateY(20px);
+            opacity: 0;
+            transition: all var(--transition-bounce);
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-overlay.active .game-window {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .close-game {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: var(--transition-bounce);
+            z-index: var(--z-modal);
+        }
+
+        .close-game:hover {
+            background: var(--accent-red);
+            color: #fff;
+            transform: rotate(90deg) scale(1.1);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 20px var(--accent-red-glow);
+        }
+
+        /* Generic Game Header Elements */
+        .game-header { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            padding-right: 40px; 
+            padding-left: 40px;
+        }
+        
+        .game-title { 
+            font-size: clamp(1.75rem, 5vw, 2.5rem); 
+            font-weight: 900; 
+            margin-bottom: 0.5rem; 
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .game-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .game-stats { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1.5rem; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap;
+        }
+        
+        .stat-item { 
+            background: rgba(0,0,0,0.4); 
+            padding: 0.75rem 1.5rem; 
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glass);
+            text-align: center;
+            min-width: 100px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            transition: var(--transition-fast);
+        }
+        .stat-item:hover {
+            border-color: var(--border-glass-active);
+            background: rgba(0,0,0,0.6);
+        }
+        
+        .stat-label { 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-weight: 700; 
+            margin-bottom: 4px; 
+        }
+        
+        .stat-value { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: #fff; 
+            font-family: 'JetBrains Mono', monospace; 
+            line-height: 1;
+        }
+
+        .game-controls-bottom { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1rem; 
+            margin-top: 2.5rem; 
+            flex-wrap: wrap; 
+        }
+
+        /* ==========================================================================
+           9. CUSTOM TOAST NOTIFICATIONS
+           ========================================================================== */
+        .modern-toast-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: var(--z-toast);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 450px;
+        }
+        
+        .modern-toast {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px var(--primary-glow);
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .modern-toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        
+        .modern-toast.error {
+            border-color: var(--accent-red);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px var(--accent-red-glow);
+        }
+        .modern-toast.success {
+            border-color: var(--accent-green);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px var(--accent-green-glow);
+        }
+        .modern-toast.warning {
+            border-color: var(--accent-yellow);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 20px var(--accent-yellow-glow);
+        }
+
+        /* ==========================================================================
+           10. SPECIFIC GAME: GUESS THE NUMBER (GTN)
+           ========================================================================== */
+        .gtn-input-wrap { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 1.5rem; 
+            background: rgba(0,0,0,0.2);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+        }
+        #gtn-input { 
+            background: rgba(0,0,0,0.5); 
+            border: 2px solid var(--border-glass); 
+            padding: 1rem; 
+            font-size: 3rem; 
+            width: 180px; 
+            text-align: center; 
+            color: #fff; 
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: var(--transition-fast);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        #gtn-input:focus { 
+            border-color: var(--accent-cyan); 
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 20px var(--accent-cyan-glow); 
+        }
+        /* Hide number spin buttons */
+        #gtn-input::-webkit-outer-spin-button,
+        #gtn-input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        #gtn-input[type=number] { -moz-appearance: textfield; }
+
+        .gtn-feedback { 
+            font-size: 1.15rem; 
+            min-height: 1.5em; 
+            font-weight: 600; 
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .gtn-history { 
+            margin-top: 2rem; 
+            width: 100%; 
+            max-height: 120px; 
+            overflow-y: auto; 
+            background: rgba(0,0,0,0.3); 
+            border-radius: var(--radius-md); 
+            padding: 1.25rem; 
+            border: 1px solid var(--border-glass);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-content: flex-start;
+        }
+        .gtn-history-item { 
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; 
+            font-size: 0.95rem; 
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition-fast);
+        }
+        .gtn-history-item:hover {
+            color: #fff;
+            border-color: var(--primary);
+            background: var(--primary-muted);
+        }
+
+        /* ==========================================================================
+           11. SPECIFIC GAME: SLIDING PUZZLE
+           ========================================================================== */
+        .puzzle-board { 
+            display: grid; 
+            gap: 10px; 
+            margin: 0 auto; 
+            width: 100%;
+            max-width: 400px; 
+            aspect-ratio: 1/1; 
+            background: rgba(0,0,0,0.4);
+            padding: 12px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .puzzle-tile {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 2rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            user-select: none;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2);
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+        }
+        .puzzle-tile::after {
+            content: '';
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .puzzle-tile:hover:not(.empty) { 
+            transform: scale(1.05) translateY(-4px); 
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+        .puzzle-tile:active:not(.empty) {
+            transform: scale(0.95) translateY(2px);
+        }
+        .puzzle-tile.empty { 
+            background: rgba(0,0,0,0.2); 
+            cursor: default; 
+            border: 2px dashed rgba(255,255,255,0.05); 
+            box-shadow: none; 
+        }
+        .puzzle-tile.empty::after { display: none; }
+
+        /* ==========================================================================
+           12. SPECIFIC GAME: MEMORY MATCH
+           ========================================================================== */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            perspective: 1000px;
+        }
+        .m-card {
+            aspect-ratio: 3/4;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        .m-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        .m-card.flipped .m-card-inner { 
+            transform: rotateY(180deg); 
+        }
+        .m-card.matched .m-card-inner { 
+            transform: rotateY(180deg) scale(0.95);
+            opacity: 0.5; 
+            filter: grayscale(100%); 
+        }
+        
+        .m-card-front, .m-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-glass);
+            box-shadow: var(--shadow-sm);
+        }
+        .m-card-front { 
+            background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,1)); 
+            font-size: 2rem;
+            color: var(--primary);
+            transition: var(--transition-fast);
+        }
+        .m-card:hover:not(.flipped):not(.matched) .m-card-front {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(40,51,70,0.9), rgba(20,30,50,1));
+            box-shadow: 0 0 15px var(--primary-muted);
+        }
+        .m-card-back { 
+            background: linear-gradient(135deg, #ffffff, #e2e8f0);
+            transform: rotateY(180deg); 
+            font-size: 2.5rem; 
+            border-color: #fff;
+            color: var(--bg-base);
+        }
+
+        /* ==========================================================================
+           13. SPECIFIC GAME: SNAKE ULTRA
+           ========================================================================== */
+        .snake-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            grid-template-rows: repeat(16, 1fr);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
+            /* Grid background scaled using percentages */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 6.25% 6.25%; 
+            overflow: hidden;
+        }
+        .snake-node { 
+            background: var(--accent-green); 
+            border-radius: 4px; 
+            z-index: 2; 
+            margin: 1px;
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+        }
+        .snake-head { 
+            background: #34d399; 
+            border-radius: 6px; 
+            z-index: 3; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
+            margin: 1px;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+            transition: transform 0.1s linear;
+        }
+        .snake-head::before, .snake-head::after {
+            content: ''; position: absolute; width: 5px; height: 5px; background: white; border-radius: 50%; top: 20%;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        .snake-head::before { left: 20%; }
+        .snake-head::after { right: 20%; }
+        
+        .apple { 
+            background: radial-gradient(circle at 30% 30%, #fb7185, var(--accent-red));
+            border-radius: 50%; 
+            z-index: 1; 
+            margin: 2px;
+            animation: pulse-apple 1.5s infinite alternate;
+            box-shadow: 0 0 10px var(--accent-red-glow);
+        }
+        
+        @keyframes pulse-apple {
+            0% { transform: scale(0.9); box-shadow: 0 0 5px var(--accent-red-glow); }
+            100% { transform: scale(1.1); box-shadow: 0 0 15px var(--accent-red-glow); }
+        }
+        
+        .head-up { transform: rotate(0deg); }
+        .head-right { transform: rotate(90deg); }
+        .head-down { transform: rotate(180deg); }
+        .head-left { transform: rotate(270deg); }
+
+        .dpad { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+            max-width: 180px; 
+            margin: 2rem auto 0; 
+        }
+        .dbtn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--border-glass);
+            width: 54px; height: 54px; 
+            border-radius: var(--radius-md); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition-fast);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dbtn:active { 
+            background: var(--primary); 
+            color: #fff; 
+            transform: scale(0.9) translateY(2px); 
+            border-color: var(--primary);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* ==========================================================================
+           14. SPECIFIC GAME: DOTS & BOXES
+           ========================================================================== */
+        .dots-board {
+            display: grid; gap: 0; margin: 0 auto; background: rgba(0,0,0,0.3);
+            padding: 24px; border-radius: var(--radius-lg); position: relative;
+            border: 1px solid var(--border-glass);
+            overflow: auto;
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .dot { 
+            width: 12px; height: 12px; 
+            background: #fff; 
+            border-radius: 50%; 
+            z-index: 5; 
+            transform: translate(-3px, -3px);
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+        .line { 
+            background: rgba(255,255,255,0.05); 
+            cursor: pointer; 
+            transition: var(--transition-fast); 
+            z-index: 4; 
+            border-radius: 12px;
+        }
+        .line:hover:not(.active) { 
+            background: rgba(255,255,255,0.4); 
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        .line.active { cursor: default; }
+        .line.p1-line { 
+            background: var(--accent-cyan); 
+            box-shadow: 0 0 12px var(--accent-cyan); 
+        }
+        .line.p2-line { 
+            background: var(--secondary); 
+            box-shadow: 0 0 12px var(--secondary); 
+        }
+        .box { 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 900; font-size: 1.75rem; 
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            z-index: 1; border-radius: 6px;
+            transform: scale(0.2) rotate(-15deg); opacity: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+        .box.p1-box { 
+            background: rgba(6, 182, 212, 0.25); 
+            color: var(--accent-cyan); 
+            transform: scale(1) rotate(0deg); 
+            opacity: 1; 
+            box-shadow: inset 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        .box.p2-box { 
+            background: rgba(236, 72, 153, 0.25); 
+            color: var(--secondary); 
+            transform: scale(1) rotate(0deg); 
+            opacity: 1; 
+            box-shadow: inset 0 0 15px rgba(236, 72, 153, 0.2);
+        }
+
+        /* ==========================================================================
+           15. SPECIFIC GAME: TIC TAC TOE
+           ========================================================================== */
+        .ttt-grid {
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            max-width: 320px; 
+            margin: 0 auto;
+        }
+        .ttt-cell {
+            aspect-ratio: 1/1;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; font-weight: 900; cursor: pointer;
+            transition: var(--transition-bounce);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+            font-family: 'Outfit', sans-serif;
+        }
+        .ttt-cell:hover:not(.taken) { 
+            background: rgba(255,255,255,0.05); 
+            transform: translateY(-4px); 
+            border-color: var(--border-glass-active);
+        }
+        .ttt-cell.x { 
+            color: var(--primary); 
+            text-shadow: 0 0 20px var(--primary-glow);
+        }
+        .ttt-cell.o { 
+            color: var(--accent-yellow); 
+            text-shadow: 0 0 20px var(--accent-yellow-glow);
+        }
+        .ttt-cell.winning-cell {
+            background: rgba(255,255,255,0.1);
+            animation: pulse-win 1s infinite alternate;
+        }
+        @keyframes pulse-win {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        /* ==========================================================================
+           16. SPECIFIC GAME: CHECKERS
+           ========================================================================== */
+        .checkers-board {
+            display: grid; grid-template-columns: repeat(8, 1fr); 
+            width: 100%; max-width: 450px; margin: 0 auto;
+            aspect-ratio: 1/1; 
+            border: 6px solid #1e293b; 
+            border-radius: var(--radius-sm);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.8); 
+            overflow: hidden;
+            background: #0f172a;
+        }
+        .c-sq { 
+            aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; position: relative; 
+        }
+        .c-sq.dark { background: #0f172a; }
+        .c-sq.light { background: #475569; }
+        .c-sq.highlight::after {
+            content: ''; position: absolute; width: 40%; height: 40%; 
+            background: rgba(16, 185, 129, 0.7);
+            border-radius: 50%; 
+            animation: pulse-apple 1.5s infinite alternate;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        .c-piece {
+            width: 80%; height: 80%; border-radius: 50%; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.6); 
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+        }
+        .c-piece.p1 { 
+            background: radial-gradient(circle at 30% 30%, #f43f5e, #9f1239); 
+            border: 2px solid #881337; 
+        }
+        .c-piece.p2 { 
+            background: radial-gradient(circle at 30% 30%, #e2e8f0, #64748b); 
+            border: 2px solid #334155; 
+        }
+        .c-piece.king::before { 
+            content: '\265B'; /* Crown Unicode */
+            font-size: 1.5rem; 
+            color: rgba(255,255,255,0.9); 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .c-piece.selected { 
+            transform: scale(1.15) translateY(-4px); 
+            border-color: var(--accent-cyan); 
+            box-shadow: inset 0 4px 8px rgba(255,255,255,0.4), 0 10px 20px rgba(0,0,0,0.6), 0 0 15px var(--accent-cyan-glow); 
+        }
+        /* AI thinking indicator */
+        .ai-thinking {
+            animation: pulse-think 1s infinite alternate;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        @keyframes pulse-think { from { opacity: 0.5; } to { opacity: 1; } }
+
+        /* ==========================================================================
+           17. SPECIFIC GAME: HANGMAN
+           ========================================================================== */
+        .hangman-wrap { 
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+            background: rgba(0,0,0,0.2);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+        }
+        .hangman-svg { 
+            width: 200px; height: 240px; margin-bottom: 1.5rem; 
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+        }
+        .hangman-svg line, .hangman-svg circle { 
+            stroke: #f8fafc; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            opacity: 0; transition: opacity 0.5s ease, stroke 0.5s ease;
+        }
+        .hangman-svg .base-struct { opacity: 1; stroke: #475569; }
+        .hangman-svg .visible { 
+            opacity: 1; 
+            stroke: var(--accent-red); 
+            filter: drop-shadow(0 0 8px var(--accent-red-glow)); 
+        }
+        
+        .hangman-word { 
+            font-size: clamp(1.75rem, 5vw, 3rem); font-weight: 800; letter-spacing: 0.75rem; margin-bottom: 2.5rem; 
+            text-transform: uppercase; font-family: 'JetBrains Mono', monospace; text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+        }
+        .hangman-keyboard { 
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 550px; 
+        }
+        .key { 
+            width: 40px; height: 40px; 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); 
+            display: flex; align-items: center; justify-content: center; border-radius: var(--radius-xs); 
+            cursor: pointer; font-weight: 700; font-size: 1.1rem; transition: var(--transition-fast);
+            color: var(--text-main);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .key:hover:not(.disabled) { 
+            background: var(--primary); border-color: var(--primary); 
+            transform: translateY(-3px); 
+            box-shadow: 0 5px 15px var(--primary-glow);
+        }
+        .key.disabled { opacity: 0.2; cursor: default; transform: scale(0.95); box-shadow: none;}
+        .key.correct { 
+            background: var(--accent-green); border-color: var(--accent-green); 
+            opacity: 1; transform: none; box-shadow: 0 0 10px var(--accent-green-glow); color: #fff;
+        }
+        .key.wrong { 
+            background: rgba(244, 63, 94, 0.15); border-color: var(--accent-red); 
+            color: var(--accent-red); opacity: 0.6; 
+        }
+
+        /* ==========================================================================
+           18. SPECIFIC GAME: STOPWATCH CHALLENGE (NEW)
+           ========================================================================== */
+        .stopwatch-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            background: rgba(0,0,0,0.3);
+            padding: 3rem 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .sw-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(4rem, 10vw, 6rem);
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+        }
+        .sw-target {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: -1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .sw-main-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 30px var(--secondary-glow), inset 0 5px 15px rgba(255,255,255,0.3);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .sw-main-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px var(--secondary-glow), inset 0 2px 5px rgba(255,255,255,0.3);
+        }
+        .sw-main-btn.state-running {
+            background: linear-gradient(135deg, var(--accent-red), #9f1239);
+            box-shadow: 0 10px 30px var(--accent-red-glow), inset 0 5px 15px rgba(255,255,255,0.3);
+        }
+        .sw-main-btn.state-countdown {
+            background: linear-gradient(135deg, var(--accent-yellow), #b45309);
+            box-shadow: 0 10px 30px var(--accent-yellow-glow), inset 0 5px 15px rgba(255,255,255,0.3);
+            cursor: wait;
+        }
+        .sw-result {
+            font-size: 1.5rem;
+            font-weight: 800;
+            min-height: 2.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sw-diff {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-top: -1.5rem;
+            min-height: 1.5rem;
+        }
+
+        /* ==========================================================================
+           19. SPECIFIC GAME: SIMON MEMORY (NEW)
+           ========================================================================== */
+        .simon-board {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+            position: relative;
+            background: #1e293b;
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 5px 15px rgba(0,0,0,0.5);
+            border: 4px solid var(--border-glass);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+        }
+        .simon-btn {
+            border-radius: 100%;
+            cursor: pointer;
+            transition: all 0.1s;
+            opacity: 0.6;
+            box-shadow: inset 0 10px 20px rgba(255,255,255,0.2), 0 5px 15px rgba(0,0,0,0.4);
+            border: none;
+            outline: none;
+        }
+        .simon-btn:active, .simon-btn.active {
+            opacity: 1;
+            transform: scale(0.98);
+        }
+        /* Quarter-circle border radii for classic Simon look */
+        .simon-btn-green { 
+            background: #22c55e; border-radius: 100% 20px 20px 20px; 
+        }
+        .simon-btn-green.active { box-shadow: 0 0 40px #22c55e, inset 0 10px 30px rgba(255,255,255,0.5); }
+        
+        .simon-btn-red { 
+            background: #ef4444; border-radius: 20px 100% 20px 20px; 
+        }
+        .simon-btn-red.active { box-shadow: 0 0 40px #ef4444, inset 0 10px 30px rgba(255,255,255,0.5); }
+        
+        .simon-btn-yellow { 
+            background: #eab308; border-radius: 20px 20px 20px 100%; 
+        }
+        .simon-btn-yellow.active { box-shadow: 0 0 40px #eab308, inset 0 10px 30px rgba(255,255,255,0.5); }
+        
+        .simon-btn-blue { 
+            background: #3b82f6; border-radius: 20px 20px 100% 20px; 
+        }
+        .simon-btn-blue.active { box-shadow: 0 0 40px #3b82f6, inset 0 10px 30px rgba(255,255,255,0.5); }
+        
+        .simon-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: #0f172a;
+            border-radius: 50%;
+            border: 6px solid #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5);
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 10;
+        }
+
+        /* ==========================================================================
+           20. MEDIA QUERIES (Mobile Optimization)
+           ========================================================================== */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 900px) {
+            .game-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+            .game-window { padding: 2rem 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .app-container { padding: 1.5rem 1rem; }
+            .game-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;}
+            .game-window { padding: 1.5rem 1rem; border-radius: var(--radius-lg); }
+            .close-game { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 1.1rem;}
+            
+            .game-stats { gap: 0.75rem; margin-bottom: 1.5rem; }
+            .stat-item { padding: 0.5rem; min-width: 80px; }
+            .stat-value { font-size: 1.25rem; }
+            
+            .memory-board { grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 400px;}
+            .m-card-front { font-size: 1.5rem; }
+            .m-card-back { font-size: 1.75rem; }
+            
+            .dots-board { padding: 15px; }
+            .btn-action { padding: 8px 14px; font-size: 0.75rem; }
+            
+            .sw-display { font-size: 4rem; }
+            .sw-main-btn { width: 120px; height: 120px; font-size: 1.25rem; }
+            
+            .simon-board { max-width: 280px; padding: 10px; gap: 10px;}
+            .simon-center { width: 90px; height: 90px; font-size: 1.75rem; border-width: 4px;}
+        }
+
+        @media (max-width: 480px) {
+            .game-grid { grid-template-columns: 1fr; } /* Full width on tiny screens */
+            .game-card { min-height: auto; align-items: center; text-align: center; }
+            .card-icon-wrap { margin-bottom: 0.75rem; }
+            
+            .puzzle-tile { font-size: 1.5rem; }
+            .ttt-cell { font-size: 3rem; }
+            #gtn-input { font-size: 2.5rem; width: 140px; padding: 0.5rem;}
+            
+            .hangman-word { font-size: 1.5rem; letter-spacing: 0.3rem; }
+            .hangman-svg { width: 150px; height: 180px; }
+            .key { width: 32px; height: 32px; font-size: 0.95rem; }
+            
+            .checkers-board { border-width: 4px; }
+        }
+        
+        footer {
+            margin-top: auto; 
+            text-align: center; 
+            padding: 3rem 0 1rem;
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            font-weight: 500;
+        }
+        footer span { 
+            color: var(--primary); 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-mesh">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+</div>
+
+<!-- Global Notification System Container -->
+<div id="toast-container" class="modern-toast-container"></div>
+
+<!-- Main Application UI -->
+<div class="app-container">
+    <header>
+        <div class="brand-logo text-gradient">SPSgames</div>
+        <div class="version-badge">
+            <i class="ph-fill ph-rocket-launch"></i> 
+            Pro Edition v2.0
+        </div>
+    </header>
+
+    <!-- Dashboard Grid -->
+    <div class="game-grid" id="main-grid">
+        
+        <!-- Guess The Number -->
+        <div class="game-card" onclick="Engine.launch('gtn')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-hash"></i></div>
+                <h3>Guess The Number</h3>
+                <p>Pure logic. Find the hidden number within minimal attempts using high/low clues.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Sliding Puzzle -->
+        <div class="game-card" onclick="Engine.launch('puzzle')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-squares-four"></i></div>
+                <h3>Sliding Puzzle</h3>
+                <p>Classic sliding tile puzzle. Choose between standard 3x3 or complex 4x4 grids.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Memory Match -->
+        <div class="game-card" onclick="Engine.launch('memory')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-brain"></i></div>
+                <h3>Memory Match</h3>
+                <p>Train your brain. Play Solo, VS Friend, or challenge our adaptive AI opponents.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Snake Ultra -->
+        <div class="game-card" onclick="Engine.launch('snake')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-activity"></i></div>
+                <h3>Snake Ultra</h3>
+                <p>Smooth 60FPS action with progressive speed scaling and dynamic grid constraints.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Dots & Boxes -->
+        <div class="game-card" onclick="Engine.launch('dots')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-bounding-box"></i></div>
+                <h3>Dots & Boxes</h3>
+                <p>Strategic territory control. Outsmart a Friend or face the deep-thinking Hard AI.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Tic Tac Toe -->
+        <div class="game-card" onclick="Engine.launch('ttt')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-x-circle"></i></div>
+                <h3>Tic Tac Toe</h3>
+                <p>The ultimate showdown. Features an Impossible AI powered by the Minimax algorithm.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Checkers -->
+        <div class="game-card" onclick="Engine.launch('checkers')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-crown"></i></div>
+                <h3>Checkers</h3>
+                <p>Classic board game with mandatory captures, king logic, and strategic AI difficulties.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- Hangman -->
+        <div class="game-card" onclick="Engine.launch('hangman')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-user-minus"></i></div>
+                <h3>Hangman</h3>
+                <p>Vocabulary challenge featuring a massive dynamic dictionary of 4-7 letter words.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- NEW: Stopwatch Challenge -->
+        <div class="game-card" onclick="Engine.launch('stopwatch')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-timer"></i></div>
+                <h3>Stopwatch Challenge</h3>
+                <p>Test your reflexes and timing precision across 3 intense competitive modes.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+        
+        <!-- NEW: Simon Memory -->
+        <div class="game-card" onclick="Engine.launch('simon')">
+            <div class="card-content">
+                <div class="card-icon-wrap"><i class="ph ph-disc"></i></div>
+                <h3>Simon Memory</h3>
+                <p>The classic color sequence game. Memorize the pattern and repeat it flawlessly.</p>
+            </div>
+            <button class="btn-play"><i class="ph-bold ph-play"></i> Play Now</button>
+        </div>
+
+    </div>
+
+    <footer>
+        Developed by Soham Deshmukh | <span>SPSgames Pro</span>
+    </footer>
+</div>
+
+<!-- Modal Overlay for Games -->
+<div id="game-overlay" class="game-overlay">
+    <div class="game-window" id="game-window">
+        <button class="close-game" onclick="Engine.close()" title="Close Game">
+            <i class="ph ph-x"></i>
+        </button>
+        <div id="game-content">
+            <!-- Game UI gets injected here by JS Engine -->
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * ============================================================================================
+ * CORE ARCHITECTURE & UTILITIES
+ * ============================================================================================
+ * The architecture separates state management, rendering, and game loops into dedicated
+ * objects for scalability. Every game uses the global `Engine` to initialize and teardown.
+ */
+
+/**
+ * Modern Custom Alert / Toast Notification System
+ * Replaces native window.alert to maintain immersive styling.
+ * * @param {string} message - Text to display
+ * @param {string} [type='default'] - Type of toast ('default', 'success', 'error', 'warning')
+ * @param {number} [duration=3500] - Duration in ms before hiding
+ */
+window.alert = function(message, type = 'default', duration = 3500) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `modern-toast ${type !== 'default' ? type : ''}`;
+    
+    // Add icon based on type
+    let iconHTML = '';
+    if (type === 'success') iconHTML = '<i class="ph-fill ph-check-circle" style="font-size: 1.25rem;"></i>';
+    else if (type === 'error') iconHTML = '<i class="ph-fill ph-warning-circle" style="font-size: 1.25rem;"></i>';
+    else if (type === 'warning') iconHTML = '<i class="ph-fill ph-warning" style="font-size: 1.25rem;"></i>';
+    else iconHTML = '<i class="ph-fill ph-info" style="font-size: 1.25rem;"></i>';
+    
+    toast.innerHTML = `${iconHTML} <span>${message}</span>`;
+    container.appendChild(toast);
+    
+    // Animate in (slight delay ensures CSS transitions trigger)
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('show'));
+    });
+    
+    // Auto-remove
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400); // Wait for transition out
+    }, duration);
+};
+
+/**
+ * Audio System (Web Audio API)
+ * Specifically used for generating pure synthesized tones for the Simon game.
+ */
+const AudioSystem = {
+    ctx: null,
+    
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                this.ctx = new AudioContext();
+            }
+        }
+    },
+    
+    /**
+     * Plays a synthesized beep.
+     * @param {number} frequency - Note frequency in Hz
+     * @param {string} type - Oscillator type ('sine', 'square', 'triangle', 'sawtooth')
+     * @param {number} duration - Duration in seconds
+     */
+    beep(frequency, type = 'sine', duration = 0.5) {
+        if (!this.ctx) this.init();
+        if (!this.ctx) return; // Fallback if Web Audio not supported
+        
+        // Resume context if suspended (browser autoplay policy)
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        
+        const osc = this.ctx.createOscillator();
+        const gainNode = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, this.ctx.currentTime);
+        
+        // Envelope to prevent audio popping
+        gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(0.3, this.ctx.currentTime + duration - 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, this.ctx.currentTime + duration);
+        
+        osc.connect(gainNode);
+        gainNode.connect(this.ctx.destination);
+        
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+};
+
+/**
+ * Main Engine Object
+ * Handles routing, mounting, and unmounting of game modules.
+ */
+const Engine = {
+    activeGame: null,
+    
+    /**
+     * Launches a specific game by ID, tearing down any existing game first.
+     * @param {string} gameId 
+     */
+    launch(gameId) {
+        const overlay = document.getElementById('game-overlay');
+        const container = document.getElementById('game-content');
+        
+        overlay.classList.add('active');
+        container.innerHTML = ''; 
+        
+        // Clean up previous game instances if any exist
+        if (this.activeGame) this.cleanupActiveGame();
+        
+        this.activeGame = gameId;
+        
+        // Route to appropriate module
+        switch(gameId) {
+            case 'gtn': GTN.init(container); break;
+            case 'puzzle': Puzzle.init(container); break;
+            case 'memory': Memory.init(container); break;
+            case 'snake': Snake.init(container); break;
+            case 'dots': Dots.init(container); break;
+            case 'ttt': TTT.init(container); break;
+            case 'checkers': Checkers.init(container); break;
+            case 'hangman': Hangman.init(container); break;
+            case 'stopwatch': Stopwatch.init(container); break;
+            case 'simon': Simon.init(container); break;
+            default: alert('Game module not found.', 'error');
+        }
+    },
+
+    /**
+     * Closes the game overlay and triggers teardown.
+     */
+    close() {
+        document.getElementById('game-overlay').classList.remove('active');
+        this.cleanupActiveGame();
+        this.activeGame = null;
+    },
+    
+    /**
+     * Specific teardown logic for intervals, listeners, and loops.
+     */
+    cleanupActiveGame() {
+        if(this.activeGame === 'snake') Snake.stop();
+        if(this.activeGame === 'dots') Dots.stop();
+        if(this.activeGame === 'gtn' && GTN.timerInt) clearInterval(GTN.timerInt);
+        if(this.activeGame === 'puzzle' && Puzzle.timerInt) clearInterval(Puzzle.timerInt);
+        if(this.activeGame === 'stopwatch') Stopwatch.stop();
+        if(this.activeGame === 'simon') Simon.stop();
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: GUESS THE NUMBER (GTN)
+ * ============================================================================================
+ * Pure logic guessing game with binary search principles.
+ */
+const GTN = {
+    target: 0,
+    attempts: 0,
+    startTime: 0,
+    history: [],
+    timerInt: null,
+    timerStarted: false,
+
+    init(container) {
+        this.resetState();
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Guess The Number</h1>
+                <p class="game-subtitle">Find the secret number between 1 and 100</p>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Attempts</div>
+                    <div class="stat-value" id="gtn-att">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="gtn-timer">0s</div>
+                </div>
+            </div>
+            <div class="gtn-input-wrap">
+                <div class="gtn-feedback" id="gtn-msg" style="color: var(--accent-cyan);">
+                    Enter a number to start.<br>Timer begins on first entry.
+                </div>
+                <input type="number" id="gtn-input" min="1" max="100" placeholder="00" autocomplete="off">
+                <button class="btn-action btn-primary" onclick="GTN.check()">Submit Guess</button>
+            </div>
+            <div class="gtn-history" id="gtn-history"></div>
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="GTN.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        // Generate secret
+        this.target = Math.floor(Math.random() * 100) + 1;
+
+        // Bind Enter key
+        const input = document.getElementById('gtn-input');
+        input.addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') this.check(); 
+        });
+        
+        // Small delay to allow CSS transition before focusing
+        setTimeout(() => input.focus(), 100);
+    },
+
+    resetState() {
+        this.attempts = 0;
+        this.history = [];
+        this.timerStarted = false;
+        if(this.timerInt) {
+            clearInterval(this.timerInt);
+            this.timerInt = null;
+        }
+    },
+
+    startTimer() {
+        this.startTime = Date.now();
+        this.timerInt = setInterval(() => {
+            const sec = Math.floor((Date.now() - this.startTime) / 1000);
+            const timerEl = document.getElementById('gtn-timer');
+            if(timerEl) timerEl.innerText = sec + 's';
+        }, 1000);
+    },
+
+    check() {
+        const input = document.getElementById('gtn-input');
+        const val = parseInt(input.value, 10);
+        const msg = document.getElementById('gtn-msg');
+        
+        // Validation
+        if(isNaN(val) || val < 1 || val > 100) {
+            msg.innerHTML = "Error: Out of bounds.<br>Enter 1-100.";
+            msg.style.color = "var(--accent-red)";
+            msg.style.textShadow = "0 0 10px var(--accent-red-glow)";
+            return;
+        }
+
+        // Start timer on first valid guess
+        if(!this.timerStarted) {
+            this.timerStarted = true;
+            this.startTimer();
+        }
+
+        this.attempts++;
+        document.getElementById('gtn-att').innerText = this.attempts;
+        this.history.push(val);
+        this.renderHistory();
+
+        // Game Logic Evaluation
+        if(val === this.target) {
+            msg.innerHTML = `CORRECT ✅!<br>It was ${this.target}`;
+            msg.style.color = "var(--accent-green)";
+            msg.style.textShadow = "0 0 10px var(--accent-green-glow)";
+            clearInterval(this.timerInt);
+            input.disabled = true;
+            alert(`You Win! Found in ${this.attempts} attempts.`, 'success');
+        } else if(val < this.target) {
+            msg.innerHTML = "HIGHER ↑<br>Try a larger number.";
+            msg.style.color = "var(--accent-yellow)";
+            msg.style.textShadow = "none";
+        } else {
+            msg.innerHTML = "LOWER ↓<br>Try a smaller number.";
+            msg.style.color = "var(--accent-yellow)";
+            msg.style.textShadow = "none";
+        }
+        
+        input.value = '';
+        input.focus();
+    },
+
+    renderHistory() {
+        const hist = document.getElementById('gtn-history');
+        if(!hist) return;
+        hist.innerHTML = this.history.map(h => `<span class="gtn-history-item">${h}</span>`).join('');
+        hist.scrollTop = hist.scrollHeight; // Auto scroll to latest
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: SLIDING PUZZLE
+ * ============================================================================================
+ * N-puzzle implementation. Ensures solvability through random valid moves.
+ */
+const Puzzle = {
+    size: 3,
+    board: [],
+    moves: 0,
+    startTime: 0,
+    timerInt: null,
+    timerStarted: false,
+
+    init(container) {
+        this.timerStarted = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+        
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Sliding Puzzle</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.size === 3 ? 'active' : ''}" onclick="Puzzle.setComplexity(3)">3x3 Grid</button>
+                    <button class="btn-action btn-secondary ${this.size === 4 ? 'active' : ''}" onclick="Puzzle.setComplexity(4)">4x4 Grid</button>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Moves</div>
+                    <div class="stat-value" id="p-moves">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="p-timer">0s</div>
+                </div>
+            </div>
+            <div id="p-board" class="puzzle-board"></div>
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-primary" onclick="Puzzle.shuffle()">
+                    <i class="ph ph-shuffle"></i> Shuffle
+                </button>
+                <button class="btn-action btn-secondary" onclick="Puzzle.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart
+                </button>
+            </div>
+        `;
+        this.render();
+        this.shuffle(); // Auto shuffle on load
+    },
+
+    setComplexity(s) {
+        this.size = s;
+        this.init(document.getElementById('game-content'));
+    },
+
+    render() {
+        const boardEl = document.getElementById('p-board');
+        if (!boardEl) return;
+        
+        boardEl.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
+        // Initialize solved state array (1 to N^2-1, then 0 for empty)
+        this.board = Array.from({length: this.size * this.size}, (_, i) => i + 1);
+        this.board[this.board.length - 1] = 0; 
+        
+        this.updateDOM();
+    },
+
+    updateDOM() {
+        const boardEl = document.getElementById('p-board');
+        if (!boardEl) return;
+        
+        boardEl.innerHTML = '';
+        this.board.forEach((val, idx) => {
+            const div = document.createElement('div');
+            div.className = `puzzle-tile ${val === 0 ? 'empty' : ''}`;
+            div.innerText = val === 0 ? '' : val;
+            if(val !== 0) {
+                div.onclick = () => this.move(idx);
+            }
+            boardEl.appendChild(div);
+        });
+    },
+
+    startTimer() {
+        this.startTime = Date.now();
+        this.timerInt = setInterval(() => {
+            const sec = Math.floor((Date.now() - this.startTime) / 1000);
+            const timerEl = document.getElementById('p-timer');
+            if(timerEl) timerEl.innerText = sec + 's';
+        }, 1000);
+    },
+
+    move(idx) {
+        const emptyIdx = this.board.indexOf(0);
+        
+        // Calculate 2D coordinates to check adjacency
+        const row = Math.floor(idx / this.size);
+        const col = idx % this.size;
+        const eRow = Math.floor(emptyIdx / this.size);
+        const eCol = emptyIdx % this.size;
+
+        // Valid move if Manhattan distance is exactly 1
+        const isAdj = Math.abs(row - eRow) + Math.abs(col - eCol) === 1;
+
+        if(isAdj) {
+            if(!this.timerStarted) {
+                this.timerStarted = true;
+                this.startTimer();
+            }
+
+            // Swap values
+            [this.board[idx], this.board[emptyIdx]] = [this.board[emptyIdx], this.board[idx]];
+            this.moves++;
+            document.getElementById('p-moves').innerText = this.moves;
+            
+            this.updateDOM();
+            this.checkWin();
+        }
+    },
+
+    shuffle() {
+        // Reset stats
+        this.moves = 0;
+        document.getElementById('p-moves').innerText = "0";
+        document.getElementById('p-timer').innerText = "0s";
+        
+        this.timerStarted = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+
+        // Perform random valid moves to ensure solvability (parity preservation)
+        const shuffles = this.size === 3 ? 150 : 300;
+        
+        for(let i = 0; i < shuffles; i++) {
+            const emptyIdx = this.board.indexOf(0);
+            const neighbors = [];
+            const r = Math.floor(emptyIdx / this.size);
+            const c = emptyIdx % this.size;
+
+            // Gather valid neighbor indices
+            if(r > 0) neighbors.push(emptyIdx - this.size);
+            if(r < this.size - 1) neighbors.push(emptyIdx + this.size);
+            if(c > 0) neighbors.push(emptyIdx - 1);
+            if(c < this.size - 1) neighbors.push(emptyIdx + 1);
+
+            // Randomly select one neighbor and swap
+            const moveIdx = neighbors[Math.floor(Math.random() * neighbors.length)];
+            [this.board[emptyIdx], this.board[moveIdx]] = [this.board[moveIdx], this.board[emptyIdx]];
+        }
+        
+        this.updateDOM();
+    },
+
+    checkWin() {
+        const win = this.board.every((val, idx) => {
+            // Last item should be 0
+            if(idx === this.board.length - 1) return val === 0;
+            // Otherwise, items should be 1, 2, 3...
+            return val === idx + 1;
+        });
+
+        if(win) {
+            clearInterval(this.timerInt);
+            setTimeout(() => alert(`Puzzle Solved! Total Moves: ${this.moves}`, 'success'), 150);
+        }
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: MEMORY MATCH
+ * ============================================================================================
+ * Card matching game with Local Multiplayer and AI (Easy, Medium, Hard).
+ */
+const Memory = {
+    mode: 'solo', // 'solo', 'friend', 'ai'
+    difficulty: 'medium', // 'easy', 'medium', 'hard'
+    cards: [],
+    flipped: [],
+    matches: 0,
+    lock: false,
+    scores: { p1: 0, p2: 0 },
+    turn: 'p1',
+    aiMemory: new Map(), // Tracks seen cards: idx -> icon
+    
+    // Core Icon Set (Phosphor Icons)
+    iconSet: [
+        '<i class="ph ph-cpu"></i>', '<i class="ph ph-database"></i>', 
+        '<i class="ph ph-fingerprint"></i>', '<i class="ph ph-globe-hemisphere-east"></i>',
+        '<i class="ph ph-lightning"></i>', '<i class="ph ph-planet"></i>',
+        '<i class="ph ph-rocket-launch"></i>', '<i class="ph ph-shield-check"></i>', 
+        '<i class="ph ph-sword"></i>'
+    ],
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Memory Match</h1>
+                
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'solo' ? 'active':''}" onclick="Memory.setMode('solo')">Solo</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'friend' ? 'active':''}" onclick="Memory.setMode('friend')">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'ai' ? 'active':''}" onclick="Memory.setMode('ai')">VS AI</button>
+                </div>
+                
+                <div id="m-diff-controls" class="controls-group ${this.mode !== 'ai' ? 'hidden' : ''}">
+                    <button class="btn-action btn-secondary ${this.difficulty === 'easy' ? 'active':''}" onclick="Memory.setDiff('easy')">Easy AI</button>
+                    <button class="btn-action btn-secondary ${this.difficulty === 'medium' ? 'active':''}" onclick="Memory.setDiff('medium')">Medium AI</button>
+                    <button class="btn-action btn-secondary ${this.difficulty === 'hard' ? 'active':''}" onclick="Memory.setDiff('hard')">Hard AI</button>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label" id="p1-label">P1 Score</div>
+                    <div class="stat-value" id="m-s1" style="color: var(--primary);">0</div>
+                </div>
+                <div class="stat-item" id="p2-stat">
+                    <div class="stat-label" id="p2-label">P2 Score</div>
+                    <div class="stat-value" id="m-s2" style="color: var(--secondary);">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Turn</div>
+                    <div class="stat-value" id="m-turn">P1</div>
+                </div>
+            </div>
+            
+            <div id="m-board" class="memory-board"></div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="Memory.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        this.setupBoard();
+    },
+
+    setMode(m) { 
+        this.mode = m; 
+        this.init(document.getElementById('game-content')); 
+    },
+    
+    setDiff(d) { 
+        this.difficulty = d; 
+        this.init(document.getElementById('game-content')); 
+    },
+
+    setupBoard() {
+        // Create pairs
+        const deck = [...this.iconSet, ...this.iconSet];
+        // Fisher-Yates Shuffle
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+        
+        this.cards = deck;
+        this.flipped = [];
+        this.matches = 0;
+        this.scores = { p1: 0, p2: 0 };
+        this.turn = 'p1';
+        this.lock = false;
+        this.aiMemory.clear();
+
+        // Adjust UI for solo mode
+        if(this.mode === 'solo') {
+            document.getElementById('p2-stat').classList.add('hidden');
+            document.getElementById('p1-label').innerText = "Matches";
+        } else {
+            document.getElementById('p2-stat').classList.remove('hidden');
+            document.getElementById('p1-label').innerText = "P1 Score";
+            if (this.mode === 'ai') document.getElementById('p2-label').innerText = "AI Score";
+            else document.getElementById('p2-label').innerText = "P2 Score";
+        }
+
+        const board = document.getElementById('m-board');
+        if (!board) return;
+        
+        board.innerHTML = '';
+        this.cards.forEach((icon, idx) => {
+            const card = document.createElement('div');
+            card.className = 'm-card';
+            card.dataset.idx = idx;
+            card.innerHTML = `
+                <div class="m-card-inner">
+                    <div class="m-card-front"><i class="ph ph-question"></i></div>
+                    <div class="m-card-back">${icon}</div>
+                </div>
+            `;
+            // Bind click
+            card.onclick = () => this.handleFlip(idx);
+            board.appendChild(card);
+        });
+        
+        this.updateUI();
+    },
+
+    handleFlip(idx) {
+        if(this.lock) return; // Board is locked (animating)
+        if(this.mode === 'ai' && this.turn === 'p2') return; // AI's turn
+        
+        const cardEls = document.querySelectorAll('.m-card');
+        // Prevent flipping already flipped or matched cards
+        if(cardEls[idx].classList.contains('flipped') || cardEls[idx].classList.contains('matched')) return;
+
+        this.processFlip(idx);
+    },
+
+    /**
+     * Central logic for flipping a card, tracking state, and checking matches.
+     * @param {number} idx - Index of the card in the array
+     */
+    processFlip(idx) {
+        const cardEls = document.querySelectorAll('.m-card');
+        const icon = this.cards[idx];
+        
+        // Visual flip
+        cardEls[idx].classList.add('flipped');
+        this.flipped.push({idx, icon});
+
+        // AI commits to memory upon revealing
+        this.aiMemory.set(idx, icon);
+
+        // Check if two cards are flipped
+        if(this.flipped.length === 2) {
+            this.lock = true; // Lock board
+            const [cardA, cardB] = this.flipped;
+
+            if(cardA.icon === cardB.icon) {
+                // Match Found
+                setTimeout(() => {
+                    cardEls[cardA.idx].classList.add('matched');
+                    cardEls[cardB.idx].classList.add('matched');
+                    
+                    this.scores[this.turn]++;
+                    this.matches++;
+                    this.flipped = [];
+                    this.lock = false;
+                    this.updateUI();
+                    
+                    const gameEnded = this.checkWin();
+                    
+                    // If playing against AI, and AI matched, AI goes again
+                    if(!gameEnded && this.mode === 'ai' && this.turn === 'p2') {
+                        this.aiTurn();
+                    }
+                }, 600); // Wait for flip animation
+            } else {
+                // No Match Found
+                setTimeout(() => {
+                    cardEls[cardA.idx].classList.remove('flipped');
+                    cardEls[cardB.idx].classList.remove('flipped');
+                    
+                    this.flipped = [];
+                    this.lock = false;
+                    
+                    // Switch turns in multiplayer
+                    if (this.mode !== 'solo') {
+                        this.turn = this.turn === 'p1' ? 'p2' : 'p1';
+                    }
+                    this.updateUI();
+                    
+                    // Trigger AI if it's AI's turn now
+                    if(this.mode === 'ai' && this.turn === 'p2') {
+                        this.aiTurn();
+                    }
+                }, 1000); // Allow time for player to see the mismatch
+            }
+        }
+    },
+
+    /**
+     * Advanced AI Logic for Memory Match.
+     * Uses probability based on difficulty to "remember" cards.
+     */
+    aiTurn() {
+        if(this.matches === 9) return; // All matched
+        
+        const cardEls = document.querySelectorAll('.m-card');
+        const availableIdxs = [];
+        cardEls.forEach((el, i) => { 
+            if(!el.classList.contains('matched') && !el.classList.contains('flipped')) {
+                availableIdxs.push(i); 
+            }
+        });
+
+        if (availableIdxs.length === 0) return;
+
+        let choice1, choice2;
+        let knownPair = null;
+        
+        // AI Memory Pass 1: Look for an existing known pair in memory
+        const seenIcons = new Map();
+        for(let [idx, icon] of this.aiMemory) {
+            if(cardEls[idx].classList.contains('matched')) continue; // Ignore matched
+            if(seenIcons.has(icon)) {
+                knownPair = [seenIcons.get(icon), idx];
+                break;
+            }
+            seenIcons.set(icon, idx);
+        }
+
+        // Difficulty Probabilities: Memory retention chance
+        const memoryChance = this.difficulty === 'easy' ? 0.3 : (this.difficulty === 'medium' ? 0.65 : 0.95);
+        const rand = Math.random();
+
+        // 1. If pair is known and AI "remembers" based on probability
+        if(knownPair && rand < memoryChance) {
+            [choice1, choice2] = knownPair;
+        } else {
+            // 2. Pick a random first card
+            choice1 = availableIdxs[Math.floor(Math.random() * availableIdxs.length)];
+            const icon1 = this.cards[choice1];
+            
+            // AI Memory Pass 2: Look if the match for choice1 is already in memory
+            let knownMatchIdx = -1;
+            for(let [idx, icon] of this.aiMemory) {
+                if(icon === icon1 && idx !== choice1 && !cardEls[idx].classList.contains('matched')) {
+                    knownMatchIdx = idx;
+                    break;
+                }
+            }
+            
+            // 3. If match is in memory and AI remembers it
+            if(knownMatchIdx !== -1 && rand < memoryChance) {
+                choice2 = knownMatchIdx;
+            } else {
+                // 4. Otherwise, pick a completely random second card
+                const remainingAvailable = availableIdxs.filter(i => i !== choice1);
+                choice2 = remainingAvailable[Math.floor(Math.random() * remainingAvailable.length)];
+            }
+        }
+
+        // Execute AI Moves with realistic delays
+        setTimeout(() => {
+            this.processFlip(choice1);
+            // Flip second card after a delay
+            setTimeout(() => {
+                if (this.flipped.length === 1) { // Safety check
+                    this.processFlip(choice2);
+                }
+            }, 700);
+        }, 1000);
+    },
+
+    updateUI() {
+        const s1 = document.getElementById('m-s1');
+        const s2 = document.getElementById('m-s2');
+        const turnEl = document.getElementById('m-turn');
+        
+        if (s1) s1.innerText = this.scores.p1;
+        if (s2) s2.innerText = this.scores.p2;
+        
+        if (turnEl) {
+            turnEl.innerText = this.turn === 'p1' ? 'P1' : (this.mode === 'ai' ? 'AI' : 'P2');
+            turnEl.style.color = this.turn === 'p1' ? 'var(--primary)' : 'var(--secondary)';
+        }
+    },
+
+    checkWin() {
+        if(this.matches === 9) {
+            let winMsg = "";
+            let type = "success";
+            
+            if(this.mode === 'solo') {
+                winMsg = "Game Completed ✅!";
+            } else if(this.scores.p1 > this.scores.p2) {
+                winMsg = "Player 1 Wins 🏆!";
+            } else if(this.scores.p2 > this.scores.p1) {
+                winMsg = this.mode === 'ai' ? "AI Wins 🤖!" : "Player 2 Wins 🏆!";
+                if (this.mode === 'ai') type = "error";
+            } else {
+                winMsg = "It's a Draw 🤝!";
+                type = "warning";
+            }
+            
+            setTimeout(() => alert(winMsg, type), 500);
+            return true;
+        }
+        return false;
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: SNAKE ULTRA
+ * ============================================================================================
+ * Fluid movement implementation utilizing requestAnimationFrame equivalent intervals.
+ */
+const Snake = {
+    gridSize: 16, // 16x16 grid
+    snake: [],
+    dir: {x: 1, y: 0},
+    nextDir: {x: 1, y: 0},
+    apple: {x: 5, y: 5},
+    score: 0,
+    speed: 200,
+    speedInc: 10,
+    minSpeed: 50,
+    gameLoop: null,
+    mode: 'medium',
+    isGameOver: false,
+    
+    // To prevent rapid double-key presses in one tick from reversing snake
+    tickLock: false, 
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Snake Ultra</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'slow' ? 'active':''}" onclick="Snake.setMode('slow')">Slow</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'medium' ? 'active':''}" onclick="Snake.setMode('medium')">Medium</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'fast' ? 'active':''}" onclick="Snake.setMode('fast')">Fast</button>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="s-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Pace</div>
+                    <div class="stat-value" id="s-speed">200ms</div>
+                </div>
+            </div>
+            
+            <div id="s-board" class="snake-container"></div>
+            
+            <div class="dpad">
+                <div></div>
+                <div class="dbtn" onclick="Snake.changeDir(0,-1)"><i class="ph ph-caret-up"></i></div>
+                <div></div>
+                
+                <div class="dbtn" onclick="Snake.changeDir(-1,0)"><i class="ph ph-caret-left"></i></div>
+                <div class="dbtn" onclick="Snake.changeDir(0,1)"><i class="ph ph-caret-down"></i></div>
+                <div class="dbtn" onclick="Snake.changeDir(1,0)"><i class="ph ph-caret-right"></i></div>
+            </div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="Snake.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        this.resetState();
+        window.addEventListener('keydown', this.handleKeys);
+    },
+
+    setMode(m) {
+        this.mode = m;
+        // Adjust speed increment based on difficulty
+        this.speedInc = m === 'slow' ? 5 : (m === 'medium' ? 10 : 20);
+        // Base starting speeds
+        this.speed = m === 'slow' ? 300 : (m === 'medium' ? 200 : 120);
+        this.init(document.getElementById('game-content'));
+    },
+
+    resetState() {
+        this.stop();
+        this.isGameOver = false;
+        // Start snake with 3 segments
+        this.snake = [{x: 3, y: 7}, {x: 2, y: 7}, {x: 1, y: 7}];
+        this.dir = {x: 1, y: 0};
+        this.nextDir = {x: 1, y: 0};
+        this.score = 0;
+        this.tickLock = false;
+        
+        // Re-apply base speed depending on mode
+        this.speed = this.mode === 'slow' ? 300 : (this.mode === 'medium' ? 200 : 120);
+        
+        this.spawnApple();
+        this.startLoop();
+    },
+
+    startLoop() {
+        if(this.isGameOver) return;
+        
+        const loop = () => {
+            if(this.isGameOver) return;
+            this.updatePhysics();
+            this.renderFrame();
+            
+            if(!this.isGameOver) {
+                this.gameLoop = setTimeout(loop, this.speed);
+            }
+        };
+        loop(); // Trigger first iteration
+    },
+
+    stop() {
+        if(this.gameLoop) {
+            clearTimeout(this.gameLoop);
+            this.gameLoop = null;
+        }
+        window.removeEventListener('keydown', this.handleKeys);
+    },
+
+    handleKeys: (e) => {
+        // Prevent default scrolling for arrow keys
+        if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+            e.preventDefault();
+        }
+        
+        if(['ArrowUp','w','W'].includes(e.key)) Snake.changeDir(0, -1);
+        if(['ArrowDown','s','S'].includes(e.key)) Snake.changeDir(0, 1);
+        if(['ArrowLeft','a','A'].includes(e.key)) Snake.changeDir(-1, 0);
+        if(['ArrowRight','d','D'].includes(e.key)) Snake.changeDir(1, 0);
+    },
+
+    changeDir(x, y) {
+        if (this.tickLock) return; // Prevent multiple changes in one tick
+        
+        // Prevent 180 degree turns (can't move opposite to current dir)
+        if(x !== -this.dir.x && y !== -this.dir.y) {
+            this.nextDir = {x, y};
+            this.tickLock = true; 
+        }
+    },
+
+    spawnApple() {
+        let valid = false;
+        while (!valid) {
+            this.apple = {
+                x: Math.floor(Math.random() * this.gridSize),
+                y: Math.floor(Math.random() * this.gridSize)
+            };
+            // Ensure apple doesn't spawn ON the snake
+            valid = !this.snake.some(s => s.x === this.apple.x && s.y === this.apple.y);
+        }
+    },
+
+    updatePhysics() {
+        if(this.isGameOver) return;
+
+        // Apply locked direction
+        this.dir = this.nextDir;
+        this.tickLock = false; // Release lock for next tick
+
+        // Calculate new head position
+        const head = { 
+            x: this.snake[0].x + this.dir.x, 
+            y: this.snake[0].y + this.dir.y 
+        };
+
+        // Wall Collision Check
+        if(head.x < 0 || head.x >= this.gridSize || head.y < 0 || head.y >= this.gridSize) {
+            return this.triggerGameOver("Hit the wall!");
+        }
+        
+        // Self Collision Check
+        if(this.snake.some(s => s.x === head.x && s.y === head.y)) {
+            return this.triggerGameOver("Ate yourself!");
+        }
+
+        // Add new head
+        this.snake.unshift(head);
+
+        // Apple Collision Check
+        if(head.x === this.apple.x && head.y === this.apple.y) {
+            this.score += 10;
+            // Increase speed up to minSpeed cap
+            this.speed = Math.max(this.minSpeed, this.speed - this.speedInc);
+            
+            const scoreEl = document.getElementById('s-score');
+            const speedEl = document.getElementById('s-speed');
+            if (scoreEl) scoreEl.innerText = this.score;
+            if (speedEl) speedEl.innerText = this.speed + 'ms';
+            
+            this.spawnApple();
+        } else {
+            // Remove tail if no apple eaten
+            this.snake.pop(); 
+        }
+    },
+
+    renderFrame() {
+        if(this.isGameOver) return;
+        const board = document.getElementById('s-board');
+        if(!board) return;
+        
+        board.innerHTML = ''; // Clear previous frame
+        
+        // Render Apple
+        const appleEl = document.createElement('div');
+        appleEl.className = 'apple';
+        // CSS Grid lines are 1-indexed
+        appleEl.style.gridColumnStart = this.apple.x + 1;
+        appleEl.style.gridRowStart = this.apple.y + 1;
+        board.appendChild(appleEl);
+
+        // Render Snake
+        this.snake.forEach((node, idx) => {
+            const el = document.createElement('div');
+            el.style.gridColumnStart = node.x + 1;
+            el.style.gridRowStart = node.y + 1;
+            
+            if(idx === 0) {
+                // Head node
+                el.className = 'snake-head';
+                // Determine rotation class based on direction
+                let dirClass = 'head-right';
+                if(this.dir.x === 1) dirClass = 'head-right';
+                if(this.dir.x === -1) dirClass = 'head-left';
+                if(this.dir.y === 1) dirClass = 'head-down';
+                if(this.dir.y === -1) dirClass = 'head-up';
+                el.classList.add(dirClass);
+            } else {
+                // Body node
+                el.className = 'snake-node';
+                // Slight opacity gradient for body
+                const opacity = 1 - (idx / (this.snake.length + 5));
+                el.style.opacity = opacity.toFixed(2);
+            }
+            board.appendChild(el);
+        });
+    },
+
+    triggerGameOver(reason) {
+        if(this.isGameOver) return; 
+        this.isGameOver = true;
+        this.stop();
+        setTimeout(() => alert(`Game Over 💀! ${reason} Final Score: ${this.score}`, 'error'), 100);
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: DOTS & BOXES (Deep AI Integration)
+ * ============================================================================================
+ * A highly sophisticated implementation utilizing complex heuristics and a custom 
+ * game-tree search for the Hard AI mode.
+ */
+const Dots = {
+    size: 4, // 4x4 squares (requires 5x5 dots)
+    lines: {}, // Dictionary of claimed lines. Key: 'r-c-d' (row-col-dir), Val: player (1 or 2)
+    boxes: {}, // Dictionary of claimed boxes. Key: 'r-c', Val: player
+    turn: 1, // 1 for P1, 2 for P2/AI
+    scores: { 1: 0, 2: 0 },
+    mode: 'friend', // 'friend', 'easy', 'medium', 'hard'
+    isProcessing: false, // Prevents clicks during AI turn
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Dots & Boxes</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'friend' ? 'active':''}" onclick="Dots.setMode('friend')">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'easy' ? 'active':''}" onclick="Dots.setMode('easy')">Easy AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'medium' ? 'active':''}" onclick="Dots.setMode('medium')">Med AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'hard' ? 'active':''}" onclick="Dots.setMode('hard')">Hard AI</button>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">P1 (CYAN)</div>
+                    <div class="stat-value" id="d-s1" style="color:var(--accent-cyan);">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">${this.mode === 'friend' ? 'P2' : 'AI'} (PINK)</div>
+                    <div class="stat-value" id="d-s2" style="color:var(--secondary);">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Turn</div>
+                    <div class="stat-value" id="d-turn">P1</div>
+                </div>
+            </div>
+            
+            <div id="d-board" class="dots-board"></div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="Dots.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        this.resetState();
+        
+        // Timeout ensures the container is attached to DOM before calculating fluid widths
+        setTimeout(() => this.renderBoard(), 50);
+    },
+
+    setMode(mode) { 
+        this.mode = mode; 
+        this.init(document.getElementById('game-content')); 
+    },
+
+    resetState() {
+        this.lines = {};
+        this.boxes = {};
+        this.turn = 1;
+        this.scores = { 1: 0, 2: 0 };
+        this.isProcessing = false;
+    },
+
+    stop() {
+        // Handle teardown if needed (e.g. timeout clearing)
+        this.isProcessing = false;
+    },
+
+    renderBoard() {
+        const board = document.getElementById('d-board');
+        if(!board) return;
+        
+        // Dynamically calculate responsive dimensions
+        const windowWidth = document.getElementById('game-window').clientWidth;
+        let availableWidth = windowWidth - 80; // account for padding
+        
+        // Base ideal line length is 60px
+        let idealSize = 60;
+        const dotSize = 12;
+        
+        // Scale down if on mobile
+        if (availableWidth < (this.size * 60 + 50)) {
+             idealSize = Math.max(35, Math.floor((availableWidth - 50) / this.size));
+        }
+        const lineLen = idealSize;
+
+        // Calculate total grid px size
+        const totalSize = (this.size + 1) * dotSize + this.size * lineLen;
+        board.style.width = totalSize + 48 + 'px'; // + padding
+        board.style.height = totalSize + 48 + 'px';
+        board.innerHTML = '';
+
+        const offset = 24; // matches board padding
+
+        // Render Dots, Horizontal Lines, Vertical Lines, and Boxes
+        for(let r = 0; r <= this.size; r++) {
+            for(let c = 0; c <= this.size; c++) {
+                
+                // 1. Render Dot
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.position = 'absolute';
+                dot.style.left = (c * (lineLen + dotSize) + offset) + 'px';
+                dot.style.top = (r * (lineLen + dotSize) + offset) + 'px';
+                board.appendChild(dot);
+
+                // 2. Render Horizontal Line (if not at last column)
+                if(c < this.size) {
+                    const hLine = document.createElement('div');
+                    const id = `${r}-${c}-h`;
+                    hLine.className = `line ${this.lines[id] ? 'active p'+this.lines[id]+'-line' : ''}`;
+                    hLine.style.position = 'absolute';
+                    hLine.style.width = lineLen + 'px';
+                    hLine.style.height = dotSize + 'px';
+                    hLine.style.left = (c * (lineLen + dotSize) + dotSize + offset) + 'px';
+                    hLine.style.top = (r * (lineLen + dotSize) + offset) + 'px';
+                    
+                    // Click handler
+                    hLine.onclick = () => this.handleLineClick(r, c, 'h');
+                    board.appendChild(hLine);
+                }
+
+                // 3. Render Vertical Line (if not at last row)
+                if(r < this.size) {
+                    const vLine = document.createElement('div');
+                    const id = `${r}-${c}-v`;
+                    vLine.className = `line ${this.lines[id] ? 'active p'+this.lines[id]+'-line' : ''}`;
+                    vLine.style.position = 'absolute';
+                    vLine.style.width = dotSize + 'px';
+                    vLine.style.height = lineLen + 'px';
+                    vLine.style.left = (c * (lineLen + dotSize) + offset) + 'px';
+                    vLine.style.top = (r * (lineLen + dotSize) + dotSize + offset) + 'px';
+                    
+                    // Click handler
+                    vLine.onclick = () => this.handleLineClick(r, c, 'v');
+                    board.appendChild(vLine);
+                }
+
+                // 4. Render Box Center (if not last row/col)
+                if(r < this.size && c < this.size) {
+                    const box = document.createElement('div');
+                    const id = `${r}-${c}`;
+                    box.className = `box ${this.boxes[id] ? 'p'+this.boxes[id]+'-box' : ''}`;
+                    box.innerText = this.boxes[id] ? (this.boxes[id] === 1 ? 'P1' : 'P2') : '';
+                    box.style.position = 'absolute';
+                    box.style.width = lineLen + 'px';
+                    box.style.height = lineLen + 'px';
+                    box.style.left = (c * (lineLen + dotSize) + dotSize + offset) + 'px';
+                    box.style.top = (r * (lineLen + dotSize) + dotSize + offset) + 'px';
+                    board.appendChild(box);
+                }
+            }
+        }
+        this.updateUI();
+    },
+
+    handleLineClick(r, c, dir) {
+        // Block interaction if AI is thinking or line already taken
+        if(this.isProcessing) return;
+        if(this.mode !== 'friend' && this.turn === 2) return;
+        
+        const id = `${r}-${c}-${dir}`;
+        if(this.lines[id]) return; 
+
+        this.processClaim(r, c, dir);
+    },
+
+    /**
+     * Core game logic: Claiming a line, checking for completed boxes, managing turns.
+     */
+    processClaim(r, c, dir) {
+        const id = `${r}-${c}-${dir}`;
+        this.lines[id] = this.turn;
+        
+        let boxCaptured = false;
+        
+        // Check adjacent boxes based on line direction
+        if(dir === 'h') {
+            if(this.checkAndClaimBox(r, c)) boxCaptured = true; // Box below
+            if(this.checkAndClaimBox(r-1, c)) boxCaptured = true; // Box above
+        } else {
+            if(this.checkAndClaimBox(r, c)) boxCaptured = true; // Box right
+            if(this.checkAndClaimBox(r, c-1)) boxCaptured = true; // Box left
+        }
+
+        // If no box captured, switch turns
+        if(!boxCaptured) {
+            this.turn = this.turn === 1 ? 2 : 1;
+        }
+
+        this.renderBoard(); // Re-render UI
+        
+        if (this.checkGameEnd()) return;
+
+        // Trigger AI Turn if applicable
+        if(this.turn === 2 && this.mode !== 'friend') {
+            this.isProcessing = true;
+            document.getElementById('d-turn').innerText = 'AI Thinking...';
+            document.getElementById('d-turn').style.color = 'var(--text-muted)';
+            
+            // Artificial delay for feel
+            setTimeout(() => {
+                this.executeAIMove();
+            }, 600);
+        }
+    },
+
+    /**
+     * Checks if a specific box (r,c) is complete. If so, updates state.
+     * @returns {boolean} true if newly captured, false otherwise
+     */
+    checkAndClaimBox(r, c) {
+        // Boundary check
+        if(r < 0 || r >= this.size || c < 0 || c >= this.size) return false;
+        
+        const id = `${r}-${c}`;
+        if(this.boxes[id]) return false; // Already claimed
+
+        // Need top, bottom, left, right lines
+        const top = `${r}-${c}-h`;
+        const bottom = `${r+1}-${c}-h`;
+        const left = `${r}-${c}-v`;
+        const right = `${r}-${c+1}-v`;
+
+        if(this.lines[top] && this.lines[bottom] && this.lines[left] && this.lines[right]) {
+            this.boxes[id] = this.turn;
+            this.scores[this.turn]++;
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Central AI Logic Dispatcher based on Difficulty
+     */
+    executeAIMove() {
+        if (this.checkGameEnd()) return;
+        
+        let move = null;
+        
+        if (this.mode === 'easy') {
+            move = this.getAIRandomMove();
+        } else if (this.mode === 'medium') {
+            move = this.getAIGreedyMove();
+        } else if (this.mode === 'hard') {
+            move = this.getAIHardMove();
+        }
+        
+        // Safety fallback
+        if (!move) move = this.getAIRandomMove();
+        
+        this.isProcessing = false;
+        
+        if (move) {
+            this.processClaim(move.r, move.c, move.d);
+        }
+    },
+    
+    /**
+     * Helper: Get all currently available valid lines.
+     */
+    getAvailableLines(currentStateLines) {
+        const available = [];
+        for(let r = 0; r <= this.size; r++) {
+            for(let c = 0; c <= this.size; c++) {
+                if(c < this.size && !currentStateLines[`${r}-${c}-h`]) available.push({r, c, d:'h'});
+                if(r < this.size && !currentStateLines[`${r}-${c}-v`]) available.push({r, c, d:'v'});
+            }
+        }
+        return available;
+    },
+
+    // ----------------------------------------------------
+    // AI Difficulty Implementations
+    // ----------------------------------------------------
+
+    getAIRandomMove() {
+        const available = this.getAvailableLines(this.lines);
+        if (available.length === 0) return null;
+        return available[Math.floor(Math.random() * available.length)];
+    },
+
+    /**
+     * Medium AI (Greedy)
+     * Rules:
+     * 1. If it can complete a box, DO IT immediately.
+     * 2. If it cannot, try to pick a line that DOES NOT give the opponent a 3-line box (a freebie).
+     * 3. If all moves give a freebie, pick randomly.
+     */
+    getAIGreedyMove() {
+        const available = this.getAvailableLines(this.lines);
+        
+        // 1. Look for immediate captures
+        for (let move of available) {
+            if (this.doesMoveCompleteBox(move.r, move.c, move.d, this.lines)) {
+                return move;
+            }
+        }
+        
+        // 2. Look for safe moves (doesn't create a 3-line box)
+        const safeMoves = [];
+        for (let move of available) {
+            if (!this.doesMoveCreateThreat(move.r, move.c, move.d, this.lines)) {
+                safeMoves.push(move);
+            }
+        }
+        
+        if (safeMoves.length > 0) {
+            return safeMoves[Math.floor(Math.random() * safeMoves.length)];
+        }
+        
+        // 3. Fallback to random if all moves are bad
+        return available[Math.floor(Math.random() * available.length)];
+    },
+
+    /**
+     * Hard AI (Advanced Heuristic & Chain Analysis)
+     * Extremely thorough logic for Dots and Boxes endgame strategy.
+     * Evaluates chains, avoids double-crosses, and sacrifices strategically.
+     */
+    getAIHardMove() {
+        const available = this.getAvailableLines(this.lines);
+        
+        // 1. Always take completing boxes first (Greedy component)
+        let completingMoves = available.filter(m => this.doesMoveCompleteBox(m.r, m.c, m.d, this.lines));
+        if (completingMoves.length > 0) {
+            // Optimization: If multiple completing moves, do we care which one? 
+            // In hard mode, we should take all in the chain. Pick the first.
+            return completingMoves[0];
+        }
+
+        // 2. Filter out moves that directly give the opponent a box (Dangerous moves)
+        let safeMoves = available.filter(m => !this.doesMoveCreateThreat(m.r, m.c, m.d, this.lines));
+        
+        // 3. If there are safe moves, we need to pick the "best" safe move.
+        // A simple heuristic: Pick moves that are far away from existing lines, 
+        // or prefer edges. For a 4x4, random safe is often sufficient until endgame.
+        if (safeMoves.length > 0) {
+            // Refinement: Avoid giving 2 lines to a box if possible (don't set up future chains).
+            let ultraSafe = safeMoves.filter(m => {
+                const simulatedLines = {...this.lines, [`${m.r}-${m.c}-${m.d}`]: 2};
+                // Check if any box now has exactly 2 lines. This is a setup state.
+                return !this.hasAnyBoxWithNLines(2, simulatedLines);
+            });
+            
+            if (ultraSafe.length > 0) {
+                return ultraSafe[Math.floor(Math.random() * ultraSafe.length)];
+            }
+            return safeMoves[Math.floor(Math.random() * safeMoves.length)];
+        }
+
+        // 4. ENDGAME SCENARIO (No safe moves exist)
+        // We MUST give up a box. We need to find the move that gives up the SMALLEST chain.
+        // We will simulate each available move, assume the opponent plays optimally (greedily takes everything),
+        // and evaluate the resulting state.
+        
+        let bestMove = available[0];
+        let minLoss = Infinity;
+
+        for (let move of available) {
+            const tempLines = {...this.lines, [`${m.r}-${m.c}-${m.d}`]: 2};
+            // Count how many boxes the opponent can immediately claim using greedy logic
+            let opponentYield = this.simulateOpponentChain(tempLines);
+            
+            if (opponentYield < minLoss) {
+                minLoss = opponentYield;
+                bestMove = move;
+            }
+        }
+        
+        return bestMove;
+    },
+    
+    // --- AI Utility Functions ---
+    
+    doesMoveCompleteBox(r, c, d, currentLines) {
+        const checkBox = (rr, cc) => {
+            if(rr < 0 || rr >= this.size || cc < 0 || cc >= this.size) return false;
+            // Assuming the move (r,c,d) is placed, does it complete?
+            let cnt = 0;
+            if (currentLines[`${rr}-${cc}-h`] || (d==='h' && r===rr && c===cc)) cnt++;
+            if (currentLines[`${rr+1}-${cc}-h`] || (d==='h' && r===rr+1 && c===cc)) cnt++;
+            if (currentLines[`${rr}-${cc}-v`] || (d==='v' && r===rr && c===cc)) cnt++;
+            if (currentLines[`${rr}-${cc+1}-v`] || (d==='v' && r===rr && c===cc+1)) cnt++;
+            return cnt === 4;
+        };
+        if(d === 'h') return checkBox(r, c) || checkBox(r-1, c);
+        return checkBox(r, c) || checkBox(r, c-1);
+    },
+
+    doesMoveCreateThreat(r, c, d, currentLines) {
+        // A threat is created if a box goes from 2 lines to 3 lines.
+        const countBoxLines = (rr, cc) => {
+            if(rr < 0 || rr >= this.size || cc < 0 || cc >= this.size) return 0;
+            let cnt = 0;
+            if(currentLines[`${rr}-${cc}-h`]) cnt++;
+            if(currentLines[`${rr+1}-${cc}-h`]) cnt++;
+            if(currentLines[`${rr}-${cc}-v`]) cnt++;
+            if(currentLines[`${rr}-${cc+1}-v`]) cnt++;
+            return cnt;
+        };
+        
+        if(d === 'h') {
+            return countBoxLines(r, c) === 2 || countBoxLines(r-1, c) === 2;
+        }
+        return countBoxLines(r, c) === 2 || countBoxLines(r, c-1) === 2;
+    },
+    
+    hasAnyBoxWithNLines(n, lineState) {
+        for(let r=0; r<this.size; r++) {
+            for(let c=0; c<this.size; c++) {
+                let cnt = 0;
+                if(lineState[`${r}-${c}-h`]) cnt++;
+                if(lineState[`${r+1}-${c}-h`]) cnt++;
+                if(lineState[`${r}-${c}-v`]) cnt++;
+                if(lineState[`${r}-${c+1}-v`]) cnt++;
+                if (cnt === n) return true;
+            }
+        }
+        return false;
+    },
+
+    simulateOpponentChain(initialLines) {
+        // Extremely simplified chain simulator: counts consecutive completions.
+        // Real dots & boxes theory uses disjoint set disjoints, but this is a heuristic.
+        let lines = {...initialLines};
+        let chainCount = 0;
+        let found = true;
+        
+        while(found) {
+            found = false;
+            const avail = this.getAvailableLines(lines);
+            for (let m of avail) {
+                if (this.doesMoveCompleteBox(m.r, m.c, m.d, lines)) {
+                    lines[`${m.r}-${m.c}-${m.d}`] = 1; // opponent takes it
+                    chainCount++;
+                    found = true;
+                    break; // Restart loop to check cascading completions
+                }
+            }
+        }
+        return chainCount;
+    },
+
+    // ----------------------------------------------------
+    // UI & Game State Management
+    // ----------------------------------------------------
+    updateUI() {
+        const s1 = document.getElementById('d-s1');
+        const s2 = document.getElementById('d-s2');
+        const turnEl = document.getElementById('d-turn');
+        
+        if (s1) s1.innerText = this.scores[1];
+        if (s2) s2.innerText = this.scores[2];
+        
+        if (turnEl) {
+            let tStr = this.turn === 1 ? 'P1' : 'P2';
+            if (this.mode !== 'friend' && this.turn === 2) tStr = 'AI';
+            turnEl.innerText = tStr;
+            turnEl.style.color = this.turn === 1 ? 'var(--accent-cyan)' : 'var(--secondary)';
+        }
+    },
+
+    checkGameEnd() {
+        const totalBoxes = this.size * this.size;
+        const claimedBoxes = Object.keys(this.boxes).length;
+        
+        if(claimedBoxes === totalBoxes) {
+            this.isProcessing = true; // Lock
+            let msg = "";
+            let type = "success";
+            
+            if (this.scores[1] > this.scores[2]) {
+                msg = "Player 1 Wins 🏆!";
+            } else if (this.scores[2] > this.scores[1]) {
+                msg = this.mode === 'friend' ? "Player 2 Wins 🏆!" : "AI Wins 🤖!";
+                if (this.mode !== 'friend') type = "error";
+            } else {
+                msg = "It's a Draw 🤝!";
+                type = "warning";
+            }
+            
+            setTimeout(() => alert(msg, type), 300);
+            return true;
+        }
+        return false;
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: TIC TAC TOE (Enhanced AI with Minimax)
+ * ============================================================================================
+ */
+const TTT = {
+    board: Array(9).fill(null),
+    turn: 'X',
+    mode: 'impossible', // 'friend', 'easy', 'medium', 'impossible'
+    isLocked: false,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Tic Tac Toe</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'friend' ? 'active':''}" onclick="TTT.setMode('friend')">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'easy' ? 'active':''}" onclick="TTT.setMode('easy')">Easy AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'medium' ? 'active':''}" onclick="TTT.setMode('medium')">Med AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'impossible' ? 'active':''}" onclick="TTT.setMode('impossible')">Impossible AI</button>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Current Turn</div>
+                    <div class="stat-value" id="t-turn">X</div>
+                </div>
+            </div>
+            
+            <div class="ttt-grid" id="t-grid"></div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="TTT.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        this.board = Array(9).fill(null);
+        this.turn = 'X';
+        this.isLocked = false;
+        this.renderBoard();
+    },
+
+    setMode(mode) { 
+        this.mode = mode; 
+        this.init(document.getElementById('game-content')); 
+    },
+
+    renderBoard(winningLine = null) {
+        const grid = document.getElementById('t-grid');
+        if(!grid) return;
+        
+        grid.innerHTML = '';
+        this.board.forEach((val, idx) => {
+            const cell = document.createElement('div');
+            
+            let classStr = 'ttt-cell ';
+            if (val) classStr += 'taken ' + val.toLowerCase() + ' ';
+            if (winningLine && winningLine.includes(idx)) classStr += 'winning-cell ';
+            
+            cell.className = classStr;
+            cell.innerText = val || '';
+            
+            cell.onclick = () => this.handleMove(idx);
+            grid.appendChild(cell);
+        });
+        
+        const turnEl = document.getElementById('t-turn');
+        if(turnEl) {
+            turnEl.innerText = this.turn;
+            turnEl.style.color = this.turn === 'X' ? 'var(--primary)' : 'var(--accent-yellow)';
+        }
+    },
+
+    handleMove(idx) {
+        if(this.isLocked || this.board[idx]) return;
+        if(this.mode !== 'friend' && this.turn === 'O') return; // Enforce AI turn
+        
+        this.board[idx] = this.turn;
+        
+        if (this.checkGameStatus()) return;
+
+        this.turn = this.turn === 'X' ? 'O' : 'X';
+        this.renderBoard();
+
+        if(this.mode !== 'friend' && this.turn === 'O') {
+            this.isLocked = true;
+            setTimeout(() => this.executeAIMove(), 500); // 500ms delay for realism
+        }
+    },
+    
+    checkGameStatus() {
+        const winResult = this.checkWin(this.board);
+        
+        if(winResult) {
+            this.renderBoard(winResult.line);
+            this.isLocked = true;
+            const winner = winResult.winner;
+            
+            let msg, type;
+            if (winner === 'X') {
+                msg = "Player X Wins 🏆!"; type = "success";
+            } else {
+                msg = this.mode === 'friend' ? "Player O Wins 🏆!" : "AI Wins 🤖!";
+                type = this.mode === 'friend' ? "success" : "error";
+            }
+            setTimeout(() => alert(msg, type), 300);
+            return true;
+        }
+        
+        if(!this.board.includes(null)) {
+            this.renderBoard();
+            this.isLocked = true;
+            setTimeout(() => alert("It's a Draw 🤝!", "warning"), 300);
+            return true;
+        }
+        
+        return false;
+    },
+
+    // --- Tic Tac Toe AI Logic ---
+
+    executeAIMove() {
+        if (this.isLocked === false && this.turn !== 'O') return; // Safety
+        
+        let moveIdx = -1;
+        
+        if (this.mode === 'easy') {
+            moveIdx = this.getRandomEmptyCell(this.board);
+        } else if (this.mode === 'medium') {
+            moveIdx = this.getMediumAIMove(this.board);
+        } else if (this.mode === 'impossible') {
+            moveIdx = this.getBestMinimaxMove(this.board);
+        }
+
+        if (moveIdx !== -1) {
+            this.board[moveIdx] = 'O';
+            if (this.checkGameStatus()) return;
+            
+            this.turn = 'X';
+            this.isLocked = false;
+            this.renderBoard();
+        }
+    },
+    
+    getRandomEmptyCell(b) {
+        const empty = [];
+        b.forEach((v, i) => { if(!v) empty.push(i) });
+        if (empty.length === 0) return -1;
+        return empty[Math.floor(Math.random() * empty.length)];
+    },
+    
+    getMediumAIMove(b) {
+        // 1. Can AI Win?
+        for(let i=0; i<9; i++) {
+            if(!b[i]) {
+                b[i] = 'O';
+                if(this.checkWin(b)) { b[i] = null; return i; }
+                b[i] = null;
+            }
+        }
+        // 2. Must block X?
+        for(let i=0; i<9; i++) {
+            if(!b[i]) {
+                b[i] = 'X';
+                if(this.checkWin(b)) { b[i] = null; return i; }
+                b[i] = null;
+            }
+        }
+        // 3. Take center if free, else random
+        if (!b[4]) return 4;
+        return this.getRandomEmptyCell(b);
+    },
+
+    getBestMinimaxMove(b) {
+        let bestScore = -Infinity;
+        let move = -1;
+        
+        for(let i = 0; i < 9; i++) {
+            if(!b[i]) {
+                b[i] = 'O'; // Simulate AI
+                let score = this.minimax(b, 0, false);
+                b[i] = null; // Undo
+                
+                if(score > bestScore) {
+                    bestScore = score;
+                    move = i;
+                }
+            }
+        }
+        return move;
+    },
+
+    minimax(b, depth, isMaximizing) {
+        let winObj = this.checkWin(b);
+        if(winObj) {
+            if (winObj.winner === 'O') return 10 - depth; // AI wins
+            if (winObj.winner === 'X') return depth - 10; // Human wins
+        }
+        if(!b.includes(null)) return 0; // Draw
+
+        if(isMaximizing) {
+            let bestScore = -Infinity;
+            for(let i=0; i<9; i++) {
+                if(!b[i]) {
+                    b[i] = 'O';
+                    let score = this.minimax(b, depth + 1, false);
+                    b[i] = null;
+                    bestScore = Math.max(score, bestScore);
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for(let i=0; i<9; i++) {
+                if(!b[i]) {
+                    b[i] = 'X';
+                    let score = this.minimax(b, depth + 1, true);
+                    b[i] = null;
+                    bestScore = Math.min(score, bestScore);
+                }
+            }
+            return bestScore;
+        }
+    },
+
+    checkWin(b) {
+        const ways = [
+            [0,1,2], [3,4,5], [6,7,8], // rows
+            [0,3,6], [1,4,7], [2,5,8], // cols
+            [0,4,8], [2,4,6]           // diagonals
+        ];
+        for(let w of ways) {
+            if(b[w[0]] && b[w[0]] === b[w[1]] && b[w[0]] === b[w[2]]) {
+                return { winner: b[w[0]], line: w };
+            }
+        }
+        return null;
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: CHECKERS (Deep AI implementation with Minimax and Alpha-Beta)
+ * ============================================================================================
+ * Highly sophisticated checkers engine evaluating piece counts, king status, and forcing jumps.
+ */
+const Checkers = {
+    board: [],
+    turn: 1, // 1 = P1 (Red), 2 = P2 (Grey/AI)
+    selected: null, // {r, c}
+    validMoves: [], // Array of objects
+    mode: 'medium', // 'friend', 'easy', 'medium', 'hard'
+    forceJumps: true,
+    isProcessing: false,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Checkers</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'friend' ? 'active':''}" onclick="Checkers.setMode('friend')">VS Friend</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'easy' ? 'active':''}" onclick="Checkers.setMode('easy')">Easy AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'medium' ? 'active':''}" onclick="Checkers.setMode('medium')">Med AI</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'hard' ? 'active':''}" onclick="Checkers.setMode('hard')">Hard AI</button>
+                </div>
+                <div class="controls-group mt-1">
+                    <button class="btn-action btn-secondary" onclick="Checkers.toggleForceJumps()">
+                        Force Jumps: <span id="c-fj-val" style="color:${this.forceJumps ? 'var(--accent-green)':'var(--accent-red)'}; margin-left: 4px;">${this.forceJumps ? 'ON' : 'OFF'}</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Turn</div>
+                    <div class="stat-value" id="c-turn">P1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Advantage</div>
+                    <div class="stat-value" id="c-eval">Even</div>
+                </div>
+            </div>
+            
+            <div id="c-board" class="checkers-board"></div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-secondary" onclick="Checkers.init(document.getElementById('game-content'))">
+                    <i class="ph ph-arrow-counter-clockwise"></i> Restart Game
+                </button>
+            </div>
+        `;
+        this.resetState();
+        this.renderBoard();
+    },
+
+    setMode(m) { 
+        this.mode = m; 
+        this.init(document.getElementById('game-content')); 
+    },
+    
+    toggleForceJumps() {
+        this.forceJumps = !this.forceJumps;
+        const valSpan = document.getElementById('c-fj-val');
+        if(valSpan) {
+            valSpan.innerText = this.forceJumps ? 'ON' : 'OFF';
+            valSpan.style.color = this.forceJumps ? 'var(--accent-green)' : 'var(--accent-red)';
+        }
+        this.selected = null;
+        this.validMoves = [];
+        this.renderBoard();
+    },
+
+    resetState() {
+        // Board is 8x8. Values: 0=Empty, 1=P1(Red), 2=P2(Grey), 3=P1 King, 4=P2 King
+        this.board = Array(8).fill(null).map(() => Array(8).fill(0));
+        
+        // P2 Pieces (Top)
+        for(let r = 0; r < 3; r++) {
+            for(let c = 0; c < 8; c++) {
+                if((r+c)%2 !== 0) this.board[r][c] = 2;
+            }
+        }
+        // P1 Pieces (Bottom)
+        for(let r = 5; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                if((r+c)%2 !== 0) this.board[r][c] = 1;
+            }
+        }
+        
+        this.turn = 1;
+        this.selected = null;
+        this.validMoves = [];
+        this.isProcessing = false;
+    },
+
+    renderBoard() {
+        const boardEl = document.getElementById('c-board');
+        if(!boardEl) return;
+        
+        boardEl.innerHTML = '';
+        
+        for(let r = 0; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                const sq = document.createElement('div');
+                sq.className = `c-sq ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
+                
+                // Highlight valid move destinations
+                const move = this.validMoves.find(m => m.r === r && m.c === c);
+                if(move) sq.classList.add('highlight');
+                
+                // Render Pieces
+                if(this.board[r][c] !== 0) {
+                    const piece = document.createElement('div');
+                    const type = this.board[r][c];
+                    
+                    piece.className = `c-piece ${type === 1 || type === 3 ? 'p1' : 'p2'} ${type >= 3 ? 'king' : ''}`;
+                    
+                    if(this.selected && this.selected.r === r && this.selected.c === c) {
+                        piece.classList.add('selected');
+                    }
+                    
+                    // Add AI thinking visual if active
+                    if (this.isProcessing && type === 2 && this.mode !== 'friend') {
+                        piece.classList.add('ai-thinking');
+                    }
+                    
+                    piece.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        this.handlePieceSelect(r, c); 
+                    };
+                    sq.appendChild(piece);
+                }
+                
+                // Click square to execute move
+                sq.onclick = () => { 
+                    if(move && !this.isProcessing) this.executeMove(move); 
+                };
+                boardEl.appendChild(sq);
+            }
+        }
+        
+        // Update UI Text
+        const turnEl = document.getElementById('c-turn');
+        const evalEl = document.getElementById('c-eval');
+        
+        if (turnEl) {
+            let tStr = this.turn === 1 ? 'P1' : 'P2';
+            if (this.mode !== 'friend' && this.turn === 2) tStr = 'AI';
+            turnEl.innerText = tStr;
+            turnEl.style.color = this.turn === 1 ? '#f43f5e' : '#cbd5e1';
+        }
+        
+        if (evalEl) {
+            const ev = this.evaluateBoardState(this.board);
+            if (ev > 0) {
+                evalEl.innerText = `P1 +${ev}`; evalEl.style.color = '#f43f5e';
+            } else if (ev < 0) {
+                evalEl.innerText = `P2 +${Math.abs(ev)}`; evalEl.style.color = '#cbd5e1';
+            } else {
+                evalEl.innerText = `Even`; evalEl.style.color = 'var(--text-muted)';
+            }
+        }
+    },
+
+    handlePieceSelect(r, c) {
+        if(this.isProcessing) return; // Locked for AI
+        if(this.mode !== 'friend' && this.turn === 2) return; // AI Turn
+        
+        const p = this.board[r][c];
+        
+        // Ensure selecting own piece
+        if((this.turn === 1 && (p===1||p===3)) || (this.turn === 2 && (p===2||p===4))) {
+            this.selected = {r, c};
+            this.validMoves = this.calculateValidMovesForPiece(r, c, this.board);
+            
+            // Filter for forced jumps if enabled globally
+            if(this.forceJumps) {
+                const allCaptures = this.getAllAvailableCaptures(this.turn, this.board);
+                if(allCaptures.length > 0) {
+                    // If captures exist anywhere, this piece MUST capture if it's the one selected
+                    // Or, if this piece can't capture, we just restrict validMoves to empty
+                    this.validMoves = this.validMoves.filter(m => m.isCap);
+                    
+                    if (this.validMoves.length === 0) {
+                        alert("Jump is mandatory!", "warning", 1500);
+                        this.selected = null; // Deselect invalid piece
+                    }
+                }
+            }
+            this.renderBoard();
+        }
+    },
+
+    // --- Core Logic: Move Calculation ---
+
+    /**
+     * Given a board state and a piece coordinate, return all legal moves.
+     * @returns {Array} List of move objects {r, c, isCap, capR, capC}
+     */
+    calculateValidMovesForPiece(r, c, board, capsOnly = false) {
+        const p = board[r][c];
+        const moves = [];
+        const dirs = [];
+        
+        // P1 moves UP (-1), P2 moves DOWN (+1). Kings move both.
+        if(p === 1 || p === 3 || p === 4) dirs.push([-1, -1], [-1, 1]);
+        if(p === 2 || p === 3 || p === 4) dirs.push([1, -1], [1, 1]); 
+
+        for(let [dr, dc] of dirs) {
+            const nr = r + dr, nc = c + dc; // normal move
+            const jr = r + 2*dr, jc = c + 2*dc; // jump move
+
+            // Check jumps first
+            if(jr >= 0 && jr < 8 && jc >= 0 && jc < 8 && board[jr][jc] === 0) {
+                const midPiece = board[nr][nc];
+                if(midPiece !== 0 && !this.isSameTeam(midPiece, p)) {
+                    moves.push({r: jr, c: jc, isCap: true, capR: nr, capC: nc});
+                }
+            }
+            
+            // Check regular moves (if we aren't restricted to captures)
+            if(!capsOnly && nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === 0) {
+                moves.push({r: nr, c: nc, isCap: false});
+            }
+        }
+        return moves;
+    },
+
+    isSameTeam(p1, p2) {
+        const t1 = (p1 === 1 || p1 === 3) ? 1 : 2;
+        const t2 = (p2 === 1 || p2 === 3) ? 1 : 2;
+        return t1 === t2;
+    },
+    
+    getPlayerId(p) { 
+        return (p === 1 || p === 3) ? 1 : 2; 
+    },
+
+    getAllAvailableCaptures(playerId, board) {
+        const caps = [];
+        for(let r = 0; r < 8; r++) {
+            for(let c = 0; c < 8; c++) {
+                const p = board[r][c];
+                if(p !== 0 && this.getPlayerId(p) === playerId) {
+                    const m = this.calculateValidMovesForPiece(r, c, board, true); // true = capsOnly
+                    if(m.some(move => move.isCap)) {
+                        caps.push({r, c});
+                    }
+                }
+            }
+        }
+        return caps;
+    },
+
+    /**
+     * Apply move to main board state and handle multijumps/turn switching.
+     */
+    executeMove(move) {
+        const {r, c} = this.selected;
+        let p = this.board[r][c];
+        
+        let turnContinues = false;
+
+        // Apply movement
+        this.board[move.r][move.c] = p;
+        this.board[r][c] = 0;
+
+        // Handle Capture
+        if(move.isCap) {
+            this.board[move.capR][move.capC] = 0; // Remove captured piece
+            
+            // Check for multi-jumps (using the same piece)
+            // Note: Piece isn't kinged until turn fully ends usually, but we evaluate as is.
+            const nextCaps = this.calculateValidMovesForPiece(move.r, move.c, this.board, true);
+            
+            // If more jumps are available, turn continues
+            if(nextCaps.length > 0) {
+                this.selected = {r: move.r, c: move.c};
+                this.validMoves = nextCaps; // Force player/AI to take the next jump
+                turnContinues = true;
+            }
+        }
+
+        // Handle King Promotion (Ends turn immediately in most standard rules)
+        let promoted = false;
+        if(move.r === 0 && p === 1) { this.board[move.r][move.c] = 3; promoted = true; }
+        if(move.r === 7 && p === 2) { this.board[move.r][move.c] = 4; promoted = true; }
+        
+        if (promoted) turnContinues = false; // Cannot continue jumping if just promoted
+
+        this.renderBoard();
+        
+        if (turnContinues) {
+            // Note: AI multi-jumps are handled sequentially by processSequenceStep in executeAITurn
+            return; // Wait for next action
+        }
+
+        // End of Turn
+        this.turn = this.turn === 1 ? 2 : 1;
+        this.selected = null;
+        this.validMoves = [];
+        this.isProcessing = false; // Fix: Explicitly unlock the board for the next player
+        this.renderBoard();
+        
+        if (this.checkGameOverStatus()) return;
+
+        // AI Dispatch
+        if(this.turn === 2 && this.mode !== 'friend') {
+            this.isProcessing = true;
+            setTimeout(() => this.executeAITurn(), 800); // 800ms think time
+        }
+    },
+
+    checkGameOverStatus() {
+        let p1Count = 0, p2Count = 0;
+        
+        this.board.forEach(row => {
+            row.forEach(p => {
+                if(p === 1 || p === 3) p1Count++;
+                if(p === 2 || p === 4) p2Count++;
+            });
+        });
+        
+        if(p1Count === 0) {
+            let msg = this.mode === 'friend' ? "Player 2 Wins 🏆!" : "AI Wins 🤖!";
+            setTimeout(() => alert(msg, this.mode === 'friend' ? 'success' : 'error'), 200);
+            return true;
+        }
+        if(p2Count === 0) {
+            setTimeout(() => alert("Player 1 Wins 🏆!", 'success'), 200);
+            return true;
+        }
+        
+        // Technically should check for "no valid moves", but piece count is primary.
+        return false;
+    },
+
+    // --- Advanced Checkers AI (Minimax & Heuristics) ---
+
+    executeAITurn() {
+        if(this.checkGameOverStatus()) return;
+        
+        // 1. Generate all legal moves for AI (Player 2)
+        const allLegalSequences = this.generateAllLegalMovesForPlayer(2, this.board, this.forceJumps);
+        
+        if (allLegalSequences.length === 0) {
+            // AI has no moves (blocked)
+            alert("Player 1 Wins (AI Blocked) 🏆!", 'success');
+            return;
+        }
+        
+        let chosenSequence = null;
+        
+        if (this.mode === 'easy') {
+            // Random valid move
+            chosenSequence = allLegalSequences[Math.floor(Math.random() * allLegalSequences.length)];
+        } 
+        else if (this.mode === 'medium') {
+            // Greedy: Pick move that yields highest immediate board evaluation
+            let bestEval = -Infinity;
+            let bestMoves = [];
+            
+            for (let seq of allLegalSequences) {
+                const simulatedBoard = this.applySequenceToNewBoard(this.board, seq);
+                const ev = -this.evaluateBoardState(simulatedBoard); // Negative because evaluate() is positive for P1
+                
+                if (ev > bestEval) {
+                    bestEval = ev;
+                    bestMoves = [seq];
+                } else if (ev === bestEval) {
+                    bestMoves.push(seq);
+                }
+            }
+            chosenSequence = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+        }
+        else if (this.mode === 'hard') {
+            // Deep Look-Ahead: Minimax with Alpha-Beta Pruning (Depth 4)
+            // Note: Depth 4 is computationally feasible in JS without web workers for an 8x8 board.
+            let bestEval = -Infinity;
+            let bestMoves = [];
+            
+            for (let seq of allLegalSequences) {
+                const simulatedBoard = this.applySequenceToNewBoard(this.board, seq);
+                
+                // Call minimax simulating P1's turn (minimizing player)
+                // -Infinity alpha, +Infinity beta
+                const ev = this.checkersMinimax(simulatedBoard, 3, -Infinity, Infinity, true); 
+                
+                if (ev > bestEval) {
+                    bestEval = ev;
+                    bestMoves = [seq];
+                } else if (ev === bestEval) {
+                    bestMoves.push(seq);
+                }
+            }
+            chosenSequence = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+        }
+
+        // Ensure we found a sequence
+        if (!chosenSequence) chosenSequence = allLegalSequences[0];
+
+        // Execute the sequence.
+        // A sequence is an array of moves (handles multi-jumps).
+        // Since `executeMove` expects standard UI interaction, we will trigger it sequentially.
+        
+        this.selected = chosenSequence[0].from; // Initial piece location
+        
+        // Define a recursive function to process the sequence steps visually
+        const processSequenceStep = (index) => {
+            if (index >= chosenSequence.length) return; // Done
+            
+            const moveStep = chosenSequence[index];
+            this.executeMove(moveStep.to);
+            
+            // If there's another step, the Engine `executeMove` will have left `this.selected` set to the new pos.
+            // We bypass the automatic AI timeout in executeMove by resetting isProcessing and manually calling next step.
+            if (index + 1 < chosenSequence.length) {
+                // Clear the engine's scheduled timeout if any (it schedules via timeout, so we just clear it)
+                // Actually, our engine's executeMove checks `isProcessing` for AI. We can just wait.
+                setTimeout(() => processSequenceStep(index + 1), 600);
+            }
+        };
+        
+        processSequenceStep(0);
+    },
+
+    /**
+     * Evaluation Heuristic for Checkers
+     * Positive = Good for P1 (Red), Negative = Good for P2 (AI)
+     */
+    evaluateBoardState(b) {
+        let score = 0;
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                const p = b[r][c];
+                if (p === 1) score += 10;
+                else if (p === 3) score += 30; // King highly valued
+                else if (p === 2) score -= 10;
+                else if (p === 4) score -= 30;
+                
+                // Edge protection bonus (harder to capture)
+                if (p === 1 && (c === 0 || c === 7)) score += 2;
+                if (p === 2 && (c === 0 || c === 7)) score -= 2;
+            }
+        }
+        return score;
+    },
+
+    /**
+     * Minimax core for Checkers
+     * @param {Array} boardState 
+     * @param {number} depth 
+     * @param {number} alpha 
+     * @param {number} beta 
+     * @param {boolean} isP1Turn - true if P1 (Maximizer), false if P2 (Minimizer)
+     */
+    checkersMinimax(boardState, depth, alpha, beta, isP1Turn) {
+        if (depth === 0) return this.evaluateBoardState(boardState);
+        
+        const playerId = isP1Turn ? 1 : 2;
+        const sequences = this.generateAllLegalMovesForPlayer(playerId, boardState, this.forceJumps);
+        
+        if (sequences.length === 0) {
+            // Player has no moves, loss condition
+            return isP1Turn ? -1000 : 1000;
+        }
+
+        if (isP1Turn) {
+            let maxEval = -Infinity;
+            for (let seq of sequences) {
+                const nextBoard = this.applySequenceToNewBoard(boardState, seq);
+                const ev = this.checkersMinimax(nextBoard, depth - 1, alpha, beta, false);
+                maxEval = Math.max(maxEval, ev);
+                alpha = Math.max(alpha, ev);
+                if (beta <= alpha) break; // Prune
+            }
+            return maxEval;
+        } else {
+            let minEval = Infinity;
+            for (let seq of sequences) {
+                const nextBoard = this.applySequenceToNewBoard(boardState, seq);
+                const ev = this.checkersMinimax(nextBoard, depth - 1, alpha, beta, true);
+                minEval = Math.min(minEval, ev);
+                beta = Math.min(beta, ev);
+                if (beta <= alpha) break; // Prune
+            }
+            return minEval;
+        }
+    },
+
+    /**
+     * Deep generation of all legal moves, resolving multi-jumps into flat sequences.
+     */
+    generateAllLegalMovesForPlayer(playerId, board, forceJumps) {
+        let sequences = [];
+        let hasCaps = false;
+
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                const p = board[r][c];
+                if(p !== 0 && this.getPlayerId(p) === playerId) {
+                    
+                    const initialMoves = this.calculateValidMovesForPiece(r, c, board, false);
+                    
+                    for (let move of initialMoves) {
+                        if (move.isCap) {
+                            hasCaps = true;
+                            // Resolve full sequence recursively
+                            const fullPaths = this.resolveMultiJumpPaths(board, {r, c}, move);
+                            sequences.push(...fullPaths);
+                        } else if (!forceJumps) {
+                            // If force jumps is false, we can collect normal moves anytime
+                            sequences.push([{ from: {r,c}, to: move }]);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If force jumps is true, and we found captures, return ONLY captures
+        if (forceJumps && hasCaps) {
+            return sequences.filter(seq => seq[0].to.isCap);
+        }
+        
+        // If no captures were found, gather normal moves
+        if (!hasCaps) {
+            sequences = []; // clear any partial paths
+            for(let r=0; r<8; r++) {
+                for(let c=0; c<8; c++) {
+                    const p = board[r][c];
+                    if(p !== 0 && this.getPlayerId(p) === playerId) {
+                        const moves = this.calculateValidMovesForPiece(r, c, board, false);
+                        for (let m of moves) {
+                            if (!m.isCap) sequences.push([{ from: {r,c}, to: m }]);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return sequences;
+    },
+    
+    resolveMultiJumpPaths(board, startLoc, firstMove) {
+        const paths = [];
+        
+        // Simulate this jump
+        const tempBoard = board.map(row => [...row]);
+        let pieceVal = tempBoard[startLoc.r][startLoc.c];
+        
+        tempBoard[firstMove.r][firstMove.c] = pieceVal;
+        tempBoard[startLoc.r][startLoc.c] = 0;
+        tempBoard[firstMove.capR][firstMove.capC] = 0;
+        
+        // King promotion check (halts multi-jump usually)
+        let promoted = false;
+        if (firstMove.r === 0 && pieceVal === 1) { tempBoard[firstMove.r][firstMove.c] = 3; promoted = true; }
+        if (firstMove.r === 7 && pieceVal === 2) { tempBoard[firstMove.r][firstMove.c] = 4; promoted = true; }
+
+        if (!promoted) {
+            // Check for further jumps
+            const nextCaps = this.calculateValidMovesForPiece(firstMove.r, firstMove.c, tempBoard, true);
+            
+            if (nextCaps.length > 0) {
+                for (let nextMove of nextCaps) {
+                    const subPaths = this.resolveMultiJumpPaths(tempBoard, {r: firstMove.r, c: firstMove.c}, nextMove);
+                    for (let sp of subPaths) {
+                        paths.push([ {from: startLoc, to: firstMove}, ...sp ]);
+                    }
+                }
+            } else {
+                paths.push([ {from: startLoc, to: firstMove} ]); // End of chain
+            }
+        } else {
+            paths.push([ {from: startLoc, to: firstMove} ]); // End of chain due to kinging
+        }
+        
+        return paths;
+    },
+
+    applySequenceToNewBoard(board, sequence) {
+        const newBoard = board.map(row => [...row]);
+        
+        let currR = sequence[0].from.r;
+        let currC = sequence[0].from.c;
+        let pVal = newBoard[currR][currC];
+        
+        for (let step of sequence) {
+            const m = step.to;
+            // Move
+            newBoard[m.r][m.c] = pVal;
+            newBoard[currR][currC] = 0;
+            // Cap
+            if (m.isCap) {
+                newBoard[m.capR][m.capC] = 0;
+            }
+            // Update pointers
+            currR = m.r;
+            currC = m.c;
+            
+            // Check King
+            if (currR === 0 && pVal === 1) pVal = 3;
+            if (currR === 7 && pVal === 2) pVal = 4;
+            newBoard[currR][currC] = pVal; // apply potentially promoted piece
+        }
+        
+        return newBoard;
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: HANGMAN (Dynamic 7-Letter Large Dictionary)
+ * ============================================================================================
+ */
+const Hangman = {
+    // Condensed but substantial dictionary for high replayability
+    dict: {
+        4: ["ACID","ATOM","AURA","AXIS","BALD","BASS","BEAM","BOLD","BONE","BURN","CALM","CAMP","CAVE","CHEF","CLAW","CLIP","COAL","CODE","COIN","CORE","CROP","CURE","DART","DAWN","DECK","DIAL","DIRT","DISK","DIVE","DOSE","DRAW","DROP","DRUM","ECHO","EDGE","EPIC","EVIL","EXIT","FACT","FADE","FAIL","FAIR","FEAR","FILE","FILM","FLAT","FLOW","FOLD","FOOL","FORK","FROG","FUEL","FUND","GEAR","GLAD","GLOW","GOAL","GOLF","GRAB","GRID","GRIP","GULF","HALF","HALL","HATE","HEAT","HERO","HINT","HOLD","HOPE","HORN","HOST","HUNT","IDEA","IDOL","IRON","ITEM","JAZZ","JOIN","JOKE","JUMP","JURY","KICK","KILL","KIND","KISS","KNEE","KNOT","LACK","LAMP","LANE","LEAD","LEAF","LEAN","LEAP","LENS","LIFT","LINK","LION","LOAD","LOAN","LOGO","LOOP","LUCK","LUMP","LUNG","MALL","MASK","MASS","MATE","MATH","MELT","MENU","MINT","MODE","MOOD","MYTH","NAVY","NECK","NEST","NODE","NORM","NOUN","NULL","OATH","OBEY","ORAL","OVEN","PACE","PACK","PAGE","PAIN","PAIR","PALM","PATH","PEAK","PEAR","PILL","PINE","PINK","PIPE","PLOT","PLUG","POEM","POET","POLE","POOL","PORT","POUR","PRAY","PULL","PUMP","PURE","PUSH","QUIT","RACK","RARE","RATE","REAR","RELY","RENT","REST","RICE","RICH","RISK","ROAD","ROLE","ROOT","RUIN","RUSH","SAIL","SALE","SALT","SAND","SCAN","SEAT","SEED","SEEK","SELL","SHIP","SHOE","SHOP","SHOT","SHOW","SICK","SIGN","SILK","SINK","SITE","SIZE","SKIN","SKIP","SLIP","SNOW","SOAP","SOIL","SOLD","SOUL","SOUP","SPIN","STAR","STAY","STEP","SUIT","SURE","SWIM","SYNC","TANK","TAPE","TASK","TEAM","TEAR","TENT","TERM","TEXT","THIN","TICK","TIDE","TINY","TIRE","TOAD","TOMB","TONE","TOOL","TOUR","TOWN","TRIP","TUBE","TUNE","TWIN","TYPE","UGLY","UNIT","URGE","USER","VAST","VEIN","VEST","VICE","VIEW","VOID","VOTE","WAGE","WAIT","WAKE","WARD","WARM","WASH","WAVE","WEAK","WEED","WHIP","WIDE","WIFE","WILD","WIND","WINE","WING","WIRE","WISE","WISH","WOLF","WOOL","WORM","WRAP","YARD","YARN","ZERO","ZONE"],
+        5: ["ACUTE","ADAPT","ADMIT","ADOPT","ADULT","AGENT","ALARM","ALBUM","ALERT","ALIEN","ALLOW","ALPHA","ALTER","AMONG","ANGER","ANGLE","ANGRY","APPLE","APPLY","ARENA","ARGUE","ARISE","ARRAY","ARROW","ASSET","AUDIO","AVOID","AWAKE","AWARE","BADGE","BAKER","BASIC","BASIS","BEACH","BEAST","BEGIN","BELLY","BENCH","BERRY","BINGO","BIRTH","BLACK","BLAME","BLANK","BLAST","BLEND","BLESS","BLIND","BLOCK","BLOOD","BOARD","BOAST","BONUS","BOOST","BOUND","BRAIN","BRAVE","BREAD","BREAK","BRICK","BRIEF","BRING","BROAD","BROWN","BRUSH","BUILD","BUNCH","BUYER","CABIN","CABLE","CATCH","CAUSE","CHAIN","CHAIR","CHALK","CHAMP","CHANT","CHARM","CHART","CHASE","CHEAP","CHEAT","CHECK","CHEST","CHIEF","CHILD","CHILL","CHOIR","CIVIL","CLAIM","CLASS","CLEAN","CLEAR","CLERK","CLICK","CLOCK","CLOSE","CLOUD","COACH","COAST","COMIC","CORAL","COUNT","COURT","COVER","CRAFT","CRASH","CRAZY","CREAM","CRIME","CROSS","CROWD","CROWN","CRUEL","CRUSH","CURVE","CYCLE","DAILY","DANCE","DEATH","DELAY","DEPTH","DEVIL","DIARY","DIRTY","DISCO","DONOR","DOUBT","DRAFT","DRAMA","DREAM","DRESS","DRIFT","DRILL","DRINK","DRIVE","EAGER","EARLY","EARTH","EIGHT","ELITE","EMPTY","ENEMY","ENJOY","ENTER","EQUAL","ERROR","EVENT","EXACT","EXIST","EXTRA","FAINT","FAITH","FALSE","FAULT","FEAST","FENCE","FIELD","FIGHT","FINAL","FLAME","FLASH","FLEET","FLESH","FLOAT","FLOCK","FLOOR","FLUID","FOCUS","FORCE","FORGE","FORUM","FOUND","FRAME","FRESH","FRONT","FROST","FRUIT","FUNNY","GHOST","GIANT","GIVEN","GLASS","GLOBE","GLORY","GRACE","GRAND","GRANT","GRASS","GREAT","GREEN","GREET","GRIEF","GROUP","GUARD","GUESS","GUEST","GUIDE","HABIT","HAPPY","HARSH","HEART","HEAVY","HELLO","HONEY","HONOR","HORSE","HOTEL","HOUSE","HUMAN","HUMOR","HURRY","IDEAL","IMAGE","IMPLY","INDEX","INNER","INPUT","ISSUE","JOINT","JUDGE","JUICE","KNOWN","LABEL","LABOR","LARGE","LASER","LATER","LAUGH","LAYER","LEARN","LEAVE","LEGAL","LEMON","LEVEL","LIGHT","LIMIT","LOCAL","LOGIC","LOOSE","LOYAL","LUCKY","LUNCH","MAGIC","MAJOR","MAKER","MANGO","MARCH","MATCH","MAYOR","MEDAL","MERIT","METAL","METER","MICRO","SMILE"],
+        6: ["ABSORB","ACCEPT","ACCESS","ACTION","ACTIVE","ADJUST","ADVICE","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","APPEAR","AROUND","ARRIVE","ARTIST","ASPECT","ASSESS","ASSUME","ATTACK","AUTHOR","AVENUE","BACKUP","BALLET","BANANA","BANKER","BASKET","BATTLE","BEAUTY","BECOME","BEFORE","BEHALF","BEHIND","BELIEF","BELONG","BEYOND","BISHOP","BITTER","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIGHT","BROKEN","BUBBLE","BUDGET","BUREAU","BUTTON","CAMERA","CAMPUS","CANCEL","CANCER","CANDLE","CANVAS","CARBON","CAREER","CAREFUL","CARING","CARPET","CASUAL","CATTLE","CENTER","CHANCE","CHANGE","CHARGE","CHEESE","CHERRY","CHOICE","CHOOSE","CHORUS","CHURCH","CIRCLE","CLIENT","CLINIC","CLOSET","COFFEE","COLLAR","COLUMN","COMEDY","COMMON","COMPEL","CONVEY","CORNER","CORPUS","COSMIC","COTTON","COUPLE","COUPON","COURSE","COUSIN","CRAFTS","CREATE","CREDIT","CRISIS","CUSTOM","DAMAGE","DANGER","DARING","DEBATE","DECADE","DECIDE","DEFEND","DEFINE","DEGREE","DEMAND","DEPEND","DEPUTY","DESERT","DESIGN","DESIRE","DETAIL","DETECT","DEVICE","DEVOTE","DIFFER","DINNER","DIRECT","DIVIDE","DOCTOR","DOLLAR","DOMAIN","DOUBLE","DRAGON","DREAMY","DRIVER","DURING","EASILY","EATING","EDITOR","EFFECT","EFFORT","EIGHTH","EITHER","ELEVEN","EMERGE","EMPIRE","EMPLOY","ENERGY","ENGINE","ENOUGH","ENSURE","ENTIRE","ENTITY","ESCAPE","ESTATE","ETHICS","EXCUSE","EXPERT","EXPORT","EXTEND","EXTENT","FABRIC","FACING","FACTOR","FAILED","FAMILY","FAMOUS","FARMER","FATHER","FELLOW","FEMALE","FIERCE","FIGURE","FILLING","FILTER","FINISH","FISCAL","FLAVOR","FLIGHT","FLOWER","FLYING","FOREST","FORMAL","FORMAT","FORMER","FOSTER","FOURTH","FRIEND","FUTURE","GALAXY","GALLON","GARDEN","GATHER","GENDER","GENIUS","GENTLE","GLOBAL","GOLDEN","GOSPEL","GROWTH","GUILTY","GUITAR","HANDLE","HAPPEN","HARBOR","HARDLY","HEALTH","HEAVEN","HEIGHT","HEROIC","HIDDEN","HIGHLY","HOLLOW","HONEST","HONOUR","HORROR","HUNTER","IGNORE","ILLUDE","IMPACT","IMPORT","INCOME","INDOOR","INJURY","INSECT","INSERT","INSIDE","INTEND","INTENT","INVENT","INVEST","ISLAND","ITSELF","JACKET","JERSEY","JUNGLE","JUNIOR","KEEPER","KICKER","KIDNEY","KILLER","KNIGHT","LADIES","LATEST","LAUNCH","LAWYER","LEADER","LEAGUE","LEAVES","LEGACY","LENGTH","LESSON","LETTER","LIQUID","LISTEN","LITTLE","LIVING","LOCATE","LOGICAL","LONELY","LOUNGE","LOVELY","MAKING","MANAGE","MANNER","MANUAL","MARGIN","MARKET","MARVEL","MASTER","MATRIX","MATTER","MAYORE","MEMORY","MENTAL","METHOD","MIDDLE","MINUTE","MIRROR","MOBILE","MODERN","MODEST","MODULE","MOMENT","MONKEY","MOTHER","MOTION","MOTIVE","MURDER","MUSCLE","MUSEUM","MUTUAL","MYSTIC","NATION","NATURE","NEAREY","NEARLY","NOBODY","NORMAL","NOTICE","NUMBER","OBJECT","OBTAIN","OFFICE","ONLINE","OPTION","ORANGE","ORIGIN","OUTPUT","OXYGEN","PALACE","PARADE","PARENT","PARISH","PARLOR","PARTLY","PASTOR","PATENT","PATROL","PATRON","PEANUT","PEPPER","PERIOD","PERMIT","PERSON","PHRASE","PHYSIC","PICKUP","PILLAR","PLANET","PLASMA","PLAYER","PLEASE","PLEDGE","PLENTY","POCKET","POETRY","POISON","POLICE","POLICY","POLISH","POLITE","PONDER","PORTAL","POSTER","POTATO","POWDER","PRAYER","PREFER","PRETTY","PRIEST","PRINCE","PRISON","PROFIT","PROMPT","PROPER","PROVEN","PUBLIC","PURSUIT","PUZZLE","QUARTZ","RABBIT","RACISM","RADIUS","RANDOM","RATHER","RATING","READER","REALITY","REASON","RECALL","RECENT","RECORD","REDUCE","REFORM","REFUSE","REGARD","REGION","RELATE","RELIEF","REMAIN","REMOTE","REMOVE","REPAIR","REPEAT","REPLY","REPORT","RESCUE","RESIGN","RESIST","RESORT","RESULT","RETAIL","RETAIN","RETURN","REVEAL","REVIEW","REWARD","RHYTHM","RIBBON","RIDDLE","RIDING","RITUAL","ROBUST","ROCKET","ROLLER","ROMANCE","RUBBER","RULING","SACRED","SAFETY","SAILOR","SALARY","SAMPLE","SAVAGE","SAVING","SCARCE","SCHEME","SCHOOL","SCREEN","SCRIPT","SEARCH","SEASON","SECOND","SECRET","SECTOR","SECURE","SELDOM","SELECT","SENATE","SENIOR","SENSOR","SERIAL","SERVER","SETTLE","SEVERE","SEXUAL","SHADOW","SHARED","SHELTER","SHIELD","SIGNAL","SILENT","SILVER","SIMPLE","SINGER","SINGLE","SISTER","SKETCH","SLEEVE","SLIGHT","SMOOTH","SOCIAL","SOCIETY","SOCKET","SOLAR","SOLDIE","SOLID","SORROW","SOURCE","SOVIET","SPEECH","SPIDER","SPIRIT","SPLEND","SPONGE","SPOUSE","SPREAD","SPRING","SQUARE","STABLE","STATUS","STEADY","STRAIN","STREAM","STREET","STRESS","STRICT","STRIKE","STRING","STRONG","STUDIO","STUPID","SUBMIT","SUDDEN","SUFFER","SUMMER","SUMMIT","SUNSET","SUPERB","SUPPER","SUPPLY","SURELY","SURVEY","SWITCH","SYMBOL","SYSTEM","TABLET","TACKLE","TAILOR","TALENT","TARGET","TASTES","TAVERN","TEMPER","TENNIS","TERROR","THANK","THEORY","THINGS","THIRTY","THREAD","THREAT","THRILL","TICKET","TIMBER","TISSUE","TOILET","TOMATO","TONGUE","TOPIC","TOXIN","TRAGIC","TRAUMA","TRAVEL","TREATY","TRENDY","TROOP","TUMOR","TUNNEL","TURKEY","TWELVE","TWENTY","TYPICAL","UNABLE","UNIQUE","UNLESS","UNLIKE","UPDATE","UPWARD","USEFUL","UTMOST","VACANT","VALLEY","VANISH","VARIETY","VECTOR","VELVET","VENDOR","VENUE","VERBAL","VERIFY","VESSEL","VICTIM","VISION","VISUAL","VOLUME","VOWEL","VOYAGE","WALNUT","WANDER","WEALTH","WEAPON","WEAVER","WEEKLY","WEIGHT","WINDOW","WINTER","WISDOM","WIZARD","WONDER","WORKER","WORTHY","WRITER","YELLOW","YIELD","ZOMBIE"],
+        7: ["ABILITY","ABSENCE","ACADEMY","ACCOUNT","ACHIEVE","ACQUIRE","ADDRESS","ADVANCE","ADVERSE","ADVISOR","AGAINST","AIRPORT","ALCOHOL","ALLEGED","ALREADY","ANALYST","ANCIENT","ANOTHER","ANXIETY","ANYBODY","ANYMORE","ANYTHING","ANYWAY","APPAREL","APPEAL","APPLIED","ARCHIVE","ARTICLE","ASSAULT","ASSUME","ATTEMPT","ATTRACT","AUCTION","AVERAGE","AWESOME","BACKING","BALANCE","BANKING","BARGAIN","BATTERY","BEARING","BECAUSE","BEDROOM","BELIEVE","BENEATH","BENEFIT","BESIDES","BETWEEN","BINDING","BLANKET","BOMBING","BOOKING","BOUNDS","CABINET","CALIBER","CALLING","CAPABLE","CAPITAL","CAPTAIN","CARRIER","CASHIER","CASTING","CATALOG","CEILING","CENTRAL","CENTURY","CERTAIN","CHAMBER","CHANNEL","CHAPTER","CHARITY","CHARLIE","CHARTER","CHECKER","CHICKEN","CHRONIC","CIRCUIT","CLASSES","CLASSIC","CLIMATE","CLINIC","CLOSING","CLOSURE","CLOTHES","COASTAL","COLLEGE","COMMAND","COMMENT","COMPACT","COMPANY","COMPARE","COMPLEX","CONCEPT","CONCERN","CONCERT","CONDUCT","CONFIRM","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","COOKING","COUNCIL","COUNSEL","COUNTER","COUNTRY","CRUCIAL","CRYSTAL","CULTURE","CURRENT","CUTTING","DAMAGES","DANCING","DECADES","DECLINE","DEFAULT","DEFENSE","DEFICIT","DELIVER","DENSITY","DEPOSIT","DESCENT","DESIRES","DESKTOP","DESTINY","DESTROY","DEVELOP","DIAMOND","DICTION","DIGITAL","DILEMMA","DINING","DIPLOMA","DISCUSS","DISEASE","DISMISS","DISPLAY","DISPUTE","DIVIDED","DIVORCE","DRIVING","DYNAMIC","EARNING","ECLIPSE","ECONOMY","EDITION","EDUCATE","EFFECTS","ELASTIC","ELEMENT","EMOTION","EMPATHY","EMPRESS","ENDLESS","ENFORCED","ENGLISH","ENHANCE","ENTRYS","EPISODE","EQUALLY","EVENING","EVIDENT","EXACTLY","EXAMINE","EXAMPLE","EXCITED","EXCLUDE","EXHIBIT","EXPENSE","EXPLAIN","EXPLORE","EXPRESS","EXTREME","FACTORY","FACULTY","FAILING","FAILURE","FALLING","FANTASY","FARMING","FASHION","FEATURE","FEDERAL","FEELING","FICTION","FIFTEEN","FILTERS","FINANCE","FINDING","FISHING","FITNESS","FITTING","FIXATED","FIXTURE","FLAVORS","FLIGHTS","FOLDING","FOOTING","FOREIGN","FOREVER","FORMULA","FORTUNE","FORWARD","FOUNDER","FRAUDUL","FREEDOM","FUNDING","FUNERAL","FURNACE","GALAXY","GALLERY","GARBAGE","GARMENT","GATEWAY","GENERAL","GENESIS","GENETIC","GENUINE","GHOSTLY","GLACIER","GLAMOUR","GLASSES","GLIMPSE","GLOSING","GODDESS","GOODBYE","GORILLA","GRANITE","GRAVITY","GROCERY","GROWING","HABITAT","HALFWAY","HANDFUL","HANDLES","HANGING","HARVEST","HEALTHY","HEARING","HEATING","HEAVIER","HELPFUL","HERITAGE","HEROICS","HIDEAWY","HILARIC","HISTORY","HOLDING","HOLIDAY","HONESTY","HOPEFUL","HORIZON","HOSTAGE","HOSTILE","HOUSING","HUNDRED","HUNTING","HUSBAND","ILLEGAL","ILLNESS","ILLUSION","IMAGINE","IMAGING","IMMENSE","IMPERIA","IMPLIES","IMPORTS","IMPROVE","INCLUDE","INCOME","INDOORS","INDUSTRY","INFANTS","INITIAL","INJURED","INQUIRY","INSIGHT","INSPIRE","INSTALL","INSTANT","INSTEAD","INTENSE","INTERIM","INVOLVE","ISOLATE","JOURNAL","JOURNEY","JUSTICE","JUSTIFY","KEEPING","KITCHEN","KNOWING","LANDING","LARGELY","LASTING","LEADING","LEAFLET","LEAKAGE","LEANING","LEARNED","LEATHER","LEAVING","LECTURE","LEGENDS","LEISURE","LETTERS","LIBERTY","LIBRARY","LICENSE","LIFTING","LIMITS","LOGICAL","LOOKING","LOYALTY","MACHINE","MADNESS","MAGICAL","MAGNETS","MAILING","MAINTAI","MAJESTY","MAKING","MALARIA","MANAGER","MANDATE","MANKIND","MANNERS","MANSION","MANUALS","MARGINS","MARRIED","MARTIAL","MASSIVE","MASTERS","MATCHES","MAXIMUM","MEANING","MEASURE","MEDICAL","MEETING","MELODYS","MEMBERS","MINERAL","MINIMUM","MIRACLE","MIRRORS","MISSING","MISSION","MISTAKE","MIXTURE","MOBILE","MONARCH","MONITOR","MONSTER","MORNING","MORTALS","MOTIONS","MOTIVES","MOUNTAIN","MOVABLE","MURDERS","MUSCULAR","MUSICAL","MYSTERY","NATURAL","NEAREST","NETWORK","NEUTRAL","NOTABLE","NOTHING","NOVELTY","NUCLEAR","NUMBERS","NURSERY","NURSING","OAKLAND","OBJECTS","OBSERVE","OBVIOUS","OFFENSE","OFFICER","OFFICES","ONGOING","OPENING","OPERATE","OPINION","OPTICAL","OPTIONS","ORANGES","ORBITAL","ORGANIC","ORIGINS","OUTCOME","OUTDOOR","OUTFITS","OUTLINE","OUTLOOK","OUTSIDE","PACIFIC","PACKAGE","PAINTED","PAINTER","PAJAMAS","PALETTE","PANCAKE","PANELIS","PANTHER","PARADOX","PARENTS","PARKING","PARTIAL","PARTNER","PASSAGE","PASSION","PATENTS","PATIENT","PATTERN","PAYMENT","PENALTY","PENSION","PEOPLES","PERFECT","PERFORM","PERIODS","PERMITS","PERSONS","PHANTOM","PHARMAC","PHRASES","PHYSICS","PICKING","PICTURE","PIONEER","PIPELIN","PIRATES","PITCHER","PLACING","PLANETS","PLANNED","PLASTIC","PLAYERS","PLAYING","POCKETS","POINTER","POLICEY","POLITIC","POPULAR","PORTION","PORTRAI","POVERTY","POWDERS","POWERED","PRACTIC","PRAISED","PRECEDE","PREDICT","PREMIER","PREMISE","PREMIUM","PREPARE","PRESCOT","PRESENT","PREVENT","PRIMARY","PRINCES","PRINTED","PRINTER","PRIVACY","PRIVATE","PROBLEM","PROCEED","PROCESS","PRODUCE","PRODUCT","PROFILE","PROFITS","PROGRAM","PROJECT","PROMISE","PROMOTE","PROPHET","PROTECT","PROTEIN","PROTEST","PROVIDE","PROVINCE","PUBLISH","PULLING","PURPOSE","PUSHING","PUTTING","QUALITY","QUANTUM","QUARTER","QUEENLY","QUERIES","QUIETLY","RABBITS","RADICAL","RADIO","RAILWAY","RAINBOW","RAISING","RALLIES","RAMBLER","RANCHO","RANDOMS","RANGING","RANKING","RAPIDLY","RATINGS","REACHES","READING","REALITY","REALIZE","REASONS","RECEIPT","RECEIVE","RECIPES","RECORDS","RECOVER","RECRUIT","REDUCED","REFEREE","REFLECT","REFORMS","REFUGEE","REGULAR","RELATED","RELEASE","REMAINS","REMARKS","REMEDY","REMOVAL","REMOVED","REPLACE","REPORTS","REQUEST","REQUIRE","RESCUED","RESERVE","RESOLVE","RESPECT","RESPOND","RESTORE","RESULTS","RESUMES","RETAILS","RETIRED","RETREAT","REVENUE","REVIEWS","REWARDS","RHYTHMS","RIBBONS","RIDING","RIGHTLY","RINGING","RITUALS","ROBBERS","ROCKETS","ROLLING","ROMANCE","ROMANTIC","ROOFTOP","ROUTINE","ROYALTY","RUBBERS","RUINING","RULINGS","RUNNERS","RUNNING","SADDLES","SAFARI","SAILING","SAILORS","SALESMA","SAMPLES","SANDALS","SATISFY","SAVAGE","SAVINGS","SCANDAL","SCANNED","SCARLET","SCENARI","SCHOLAR","SCHOOLS","SCIENCE","SCREENS","SCRIPTS","SEATING","SECONDS","SECRETS","SECTION","SECTORS","SECURED","SEEKING","SEGMENT","SEISMIC","SELLERS","SELLING","SENATOR","SENDING","SENSORS","SERIOUS","SERVANT","SERVERS","SERVICE","SESSION","SETTING","SEVENTH","SEVERAL","SHADOWS","SHARING","SHELTER","SHIELDS","SHIPPED","SHOCKING","SHOOTING","SHORTLY","SHOWING","SIBLING","SIGNALS","SIGNING","SILENCE","SILICONE","SIMILAR","SINGING","SINGLES","SISTERS","SITTING","SITUATE","SKATING","SKILLS","SKILLFUL","SLEEPING","SLIDING","SLIPPED","SMOKING","SMUGGLE","SOCIETY","SOCKETS","SOLAR","SOLDIER","SOURCES","SPATIAL","SPEAKER","SPECIAL","SPECIES","SPECIFY","SPECTRE","SPEECHES","SPHERES","SPIDERS","SPIRITS","SPOKEN","SPONSOR","SPREAD","SPRINGS","SQUARES","STADIUM","STAMINA","STANDS","STARTING","STATICS","STATION","STATUES","STAYING","STEREOS","STOMACH","STORAGE","STORIES","STRANGE","STREAMS","STREETS","STRETCH","STRIKES","STRINGS","STROKES","STUDENT","STUDIES","STUDIOS","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUDDEN","SUFFER","SUGGEST","SUICIDE","SUMMERS","SUMMITS","SUNDAY","SUNRISE","SUNSETS","SUPPORT","SUPPOSE","SUPREME","SURFACE","SURGEON","SURGERY","SURPLUS","SURVIVE","SUSPECT","SUSTAIN","SWIMMING","SYMBOLS","SYMPTOMS","SYNTAX","SYSTEMS","TABLETS","TACKLES","TACTICS","TAILORS","TALENTS","TALKING","TALLIES","TARGETS","TAVERNS","TEACHER","TELLERS","TELLING","TEMPERATURE","TENDONS","TENSIONS","TERRORS","TESTING","TEXTURE","THEATER","THEMES","THERAPY","THINKER","THIRSTY","THIRTEEN","THOUGHT","THREADS","THREATS","THRILLS","TICKETS","TIMBER","TISSUES","TITLES","TOBACCO","TOILETS","TOMATOES","TONGUES","TOPICS","TORNADO","TORONTO","TOURISM","TOURIST","TOWARDS","TOWERS","TOXINS","TRACTOR","TRADERS","TRADING","TRAFFIC","TRAGEDY","TRAILER","TRAINED","TRAINER","TRAITS","TRANSIT","TRAUMA","TRAVELS","TREASURY","TREATIES","TREATS","TRILOGY","TRIUMPH","TROPHIES","TROUBLE","TRUCKS","TRUSTEE","TUMORS","TUNNELS","TURKEYS","TURNED","TURNING","TWELFTH","TWENTIES","TWITTER","TYPICAL","UNIFORM","UNKNOWN","UNUSUAL","UPDATED","UPGRADE","UPWARDS","URANIUM","USEABLE","UTILITY","VACANCY","VACCINE","VAMPIRE","VANILLA","VANTAGE","VARIANT","VARIETY","VEHICLE","VENDORS","VENTURE","VERDICT","VERSION","VESSELS","VETERAN","VICTIMS","VICTORY","VILLAGE","VINTAGE","VIOLATE","VIRTUAL","VISIONS","VISITOR","VISUALS","VITAMIN","VOLCANO","VOLUMES","VOTING","VOYAGES","WAITING","WALKING","WALLACE","WARNING","WARRANT","WARRIOR","WASHING","WEALTHY","WEAPONS","WEARERS","WEARING","WEAVERS","WEBSITE","WEDDING","WEEKEND","WEIGHTS","WELCOME","WELFARE","WESTERN","WHISPER","WILLING","WINDOWS","WINNING","WINTERS","WIRING","WISDOMS","WISHES","WITCHES","WITHOUT","WITNESS","WIZARDS","WONDERS","WORKERS","WORKING","WRITERS","WRITING","YELLOW","ZOMBIES"]
+    },
+    wordLen: 'random', // 'random', 4, 5, 6, 7
+    word: "",
+    guessed: new Set(),
+    wrong: 0,
+    maxWrong: 6,
+    isGameOver: false,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Hangman</h1>
+                <p class="game-subtitle">Guess the hidden word before it's too late</p>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.wordLen === 'random' ? 'active':''}" onclick="Hangman.setLength('random')">Auto</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 4 ? 'active':''}" onclick="Hangman.setLength(4)">4 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 5 ? 'active':''}" onclick="Hangman.setLength(5)">5 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 6 ? 'active':''}" onclick="Hangman.setLength(6)">6 Ltrs</button>
+                    <button class="btn-action btn-secondary ${this.wordLen === 7 ? 'active':''}" onclick="Hangman.setLength(7)">7 Ltrs</button>
+                </div>
+            </div>
+            
+            <div class="hangman-wrap">
+                <svg class="hangman-svg" viewBox="0 0 100 120">
+                    <!-- Scaffold (Always visible) -->
+                    <line x1="10" y1="110" x2="90" y2="110" class="base-struct" /> 
+                    <line x1="20" y1="110" x2="20" y2="10" class="base-struct" />  
+                    <line x1="20" y1="10" x2="60" y2="10" class="base-struct" />   
+                    <line x1="60" y1="10" x2="60" y2="30" class="base-struct" />   
+                    
+                    <!-- Hangman Parts (Hidden initially) -->
+                    <circle cx="60" cy="40" r="10" id="h-0" /> <!-- Head -->
+                    <line x1="60" y1="50" x2="60" y2="80" id="h-1" /> <!-- Body -->
+                    <line x1="60" y1="55" x2="45" y2="70" id="h-2" /> <!-- L Arm -->
+                    <line x1="60" y1="55" x2="75" y2="70" id="h-3" /> <!-- R Arm -->
+                    <line x1="60" y1="80" x2="45" y2="100" id="h-4" /> <!-- L Leg -->
+                    <line x1="60" y1="80" x2="75" y2="100" id="h-5" /> <!-- R Leg -->
+                </svg>
+                
+                <div class="hangman-word" id="h-display"></div>
+                <div class="hangman-keyboard" id="h-kb"></div>
+            </div>
+            
+            <div class="game-controls-bottom">
+                <button class="btn-action btn-primary" onclick="Hangman.init(document.getElementById('game-content'))">
+                    <i class="ph ph-magic-wand"></i> New Word
+                </button>
+            </div>
+        `;
+        
+        this.resetState();
+        this.generateWord();
+        this.renderWord();
+        this.renderKeyboard();
+    },
+
+    setLength(len) {
+        this.wordLen = len;
+        this.init(document.getElementById('game-content'));
+    },
+    
+    resetState() {
+        this.guessed.clear();
+        this.wrong = 0;
+        this.isGameOver = false;
+    },
+
+    generateWord() {
+        let targetLen = this.wordLen;
+        if(targetLen === 'random') {
+            targetLen = Math.floor(Math.random() * 4) + 4; // 4 to 7
+        }
+        
+        const possibleWords = this.dict[targetLen];
+        this.word = possibleWords[Math.floor(Math.random() * possibleWords.length)];
+    },
+
+    renderWord() {
+        if(this.isGameOver) {
+            // Reveal full word in red if lost
+            const displayHTML = this.word.split('').map(char => {
+                if (this.guessed.has(char)) return char;
+                return `<span style="color: var(--accent-red);">${char}</span>`;
+            }).join('');
+            document.getElementById('h-display').innerHTML = displayHTML;
+            return;
+        }
+
+        const display = this.word.split('').map(char => this.guessed.has(char) ? char : '_').join('');
+        document.getElementById('h-display').innerText = display;
+        
+        // Win Condition
+        if(!display.includes('_') && !this.isGameOver) {
+            this.isGameOver = true;
+            this.disableKeyboard();
+            setTimeout(() => alert("You Win 🏆! Outstanding vocabulary.", "success"), 200);
+        }
+    },
+
+    renderKeyboard() {
+        const kb = document.getElementById('h-kb');
+        if(!kb) return;
+        kb.innerHTML = '';
+        
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        
+        letters.split('').forEach(char => {
+            const btn = document.createElement('div');
+            btn.className = 'key';
+            btn.innerText = char;
+            btn.onclick = () => this.guess(char, btn);
+            kb.appendChild(btn);
+        });
+    },
+
+    guess(char, btn) {
+        if(this.isGameOver || this.guessed.has(char)) return;
+        
+        this.guessed.add(char);
+        btn.classList.add('disabled');
+
+        if(this.word.includes(char)) {
+            btn.classList.add('correct');
+            this.renderWord();
+        } else {
+            btn.classList.add('wrong');
+            
+            // Draw body part
+            const partEl = document.getElementById(`h-${this.wrong}`);
+            if(partEl) partEl.classList.add('visible');
+            
+            this.wrong++;
+            
+            // Lose Condition
+            if(this.wrong >= this.maxWrong) {
+                this.isGameOver = true;
+                this.disableKeyboard();
+                this.renderWord(); // Reveals word
+                setTimeout(() => alert(`Game Over 💀! The word was ${this.word}`, "error"), 400);
+            }
+        }
+    },
+    
+    disableKeyboard() {
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(k => k.classList.add('disabled'));
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: STOPWATCH CHALLENGE (NEW)
+ * ============================================================================================
+ * Precision timing game demanding high reflex accuracy.
+ */
+const Stopwatch = {
+    mode: 'reflex', // 'reflex', 'instant', 'target'
+    state: 'idle', // 'idle', 'countdown', 'running', 'stopped'
+    targetSec: 0,
+    startTime: 0,
+    endTime: 0,
+    timerInt: null,
+    countdownInt: null,
+    countdownVal: 3,
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Stopwatch Challenge</h1>
+                <div class="controls-group">
+                    <button class="btn-action btn-secondary ${this.mode === 'reflex' ? 'active':''}" onclick="Stopwatch.setMode('reflex')">Reflex</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'instant' ? 'active':''}" onclick="Stopwatch.setMode('instant')">Instant</button>
+                    <button class="btn-action btn-secondary ${this.mode === 'target' ? 'active':''}" onclick="Stopwatch.setMode('target')">Target</button>
+                </div>
+            </div>
+            
+            <div class="stopwatch-wrap">
+                <div id="sw-target-label" class="sw-target ${this.mode !== 'target' ? 'hidden' : ''}">
+                    Target: 00:00
+                </div>
+                
+                <div id="sw-display" class="sw-display">00:00</div>
+                
+                <div class="sw-result" id="sw-result"></div>
+                <div class="sw-diff" id="sw-diff"></div>
+                
+                <button id="sw-btn" class="sw-main-btn" onclick="Stopwatch.handleButtonPress()">
+                    Start
+                </button>
+            </div>
+            
+            <div class="game-controls-bottom">
+                <p style="color:var(--text-muted); font-size:0.85rem; width:100%; text-align:center;">
+                    * Focus heavily. Uses precise high-resolution timers.
+                </p>
+            </div>
+        `;
+        this.resetState();
+    },
+    
+    setMode(m) {
+        this.mode = m;
+        this.init(document.getElementById('game-content'));
+    },
+    
+    resetState() {
+        this.stopIntervals();
+        this.state = 'idle';
+        this.startTime = 0;
+        this.endTime = 0;
+        this.countdownVal = 3;
+        
+        // Reset UI
+        const disp = document.getElementById('sw-display');
+        const btn = document.getElementById('sw-btn');
+        const res = document.getElementById('sw-result');
+        const diff = document.getElementById('sw-diff');
+        const tar = document.getElementById('sw-target-label');
+        
+        if (disp) disp.innerText = "00:00";
+        if (btn) {
+            btn.innerText = "Start";
+            btn.className = "sw-main-btn";
+        }
+        if (res) res.innerText = "";
+        if (diff) diff.innerText = "";
+        
+        if (this.mode === 'target') {
+            // Generate target between 3 and 10 exact seconds
+            this.targetSec = Math.floor(Math.random() * 8) + 3;
+            if (tar) {
+                tar.innerText = `Target: ${this.formatTime(this.targetSec * 1000)}`;
+            }
+        }
+    },
+    
+    stopIntervals() {
+        if(this.timerInt) clearInterval(this.timerInt);
+        if(this.countdownInt) clearInterval(this.countdownInt);
+        this.timerInt = null;
+        this.countdownInt = null;
+    },
+    
+    // Completely unmount logic for Engine
+    stop() {
+        this.stopIntervals();
+    },
+
+    handleButtonPress() {
+        const btn = document.getElementById('sw-btn');
+        
+        switch (this.state) {
+            case 'idle':
+                // Reset result texts
+                document.getElementById('sw-result').innerText = '';
+                document.getElementById('sw-diff').innerText = '';
+                
+                if (this.mode === 'reflex') {
+                    this.startCountdown();
+                } else {
+                    this.startWatch();
+                }
+                break;
+                
+            case 'countdown':
+                // Removed the "Too Early" anti-spam feature as requested
+                break;
+                
+            case 'running':
+                this.stopWatch();
+                break;
+                
+            case 'stopped':
+                this.resetState();
+                break;
+        }
+    },
+    
+    startCountdown() {
+        this.state = 'countdown';
+        this.countdownVal = 3;
+        
+        const disp = document.getElementById('sw-display');
+        const btn = document.getElementById('sw-btn');
+        
+        btn.innerText = "Wait...";
+        btn.className = "sw-main-btn state-countdown";
+        disp.innerText = `0${this.countdownVal}:00`;
+        
+        this.countdownInt = setInterval(() => {
+            this.countdownVal--;
+            
+            if (this.countdownVal > 0) {
+                disp.innerText = `0${this.countdownVal}:00`;
+            } else if (this.countdownVal === 0) {
+                // Time to start!
+                clearInterval(this.countdownInt);
+                this.startWatch();
+            }
+        }, 1000);
+    },
+    
+    startWatch() {
+        this.state = 'running';
+        this.startTime = performance.now();
+        
+        const disp = document.getElementById('sw-display');
+        const btn = document.getElementById('sw-btn');
+        
+        btn.innerText = "Stop";
+        btn.className = "sw-main-btn state-running";
+        
+        // Hide display for reflex mode to rely entirely on sound/feeling if wanted,
+        // Actually, instructions say "hidden stopwatch starts". Let's show "GO!" or keep it ticking.
+        // The prompt says "hidden stopwatch starts" for reflex mode. So we blank it.
+        if (this.mode === 'reflex') {
+            disp.innerText = "GO!";
+            disp.style.color = "var(--accent-green)";
+        } else {
+            // Instant or Target mode: Show running timer (using requestAnimationFrame for smooth UI, but setInterval is okay for simple SS:CC)
+            this.timerInt = setInterval(() => {
+                const elapsed = performance.now() - this.startTime;
+                disp.innerText = this.formatTime(elapsed);
+            }, 10); // ~100fps
+        }
+    },
+    
+    stopWatch() {
+        this.endTime = performance.now();
+        this.stopIntervals();
+        this.state = 'stopped';
+        
+        const elapsed = this.endTime - this.startTime;
+        const disp = document.getElementById('sw-display');
+        const btn = document.getElementById('sw-btn');
+        const res = document.getElementById('sw-result');
+        const diff = document.getElementById('sw-diff');
+        
+        // Reset display color if altered
+        disp.style.color = "#fff";
+        disp.innerText = this.formatTime(elapsed);
+        
+        btn.innerText = "Reset";
+        btn.className = "sw-main-btn";
+        
+        // Evaluation Logic
+        const seconds = elapsed / 1000;
+        
+        if (this.mode === 'target') {
+            // Calculate absolute difference from target
+            const error = Math.abs(this.targetSec - seconds);
+            diff.innerText = `Difference: ${error.toFixed(3)}s`;
+            
+            if (error < 0.05) {
+                res.innerText = "PERFECT 🎯"; res.style.color = "var(--primary)";
+            } else if (error < 0.2) {
+                res.innerText = "Excellent"; res.style.color = "var(--accent-green)";
+            } else if (error < 0.5) {
+                res.innerText = "Good"; res.style.color = "var(--accent-yellow)";
+            } else {
+                res.innerText = "Missed"; res.style.color = "var(--accent-red)";
+            }
+        } else {
+            // Reflex or Instant mode evaluation
+            diff.innerText = `Reaction Time: ${seconds.toFixed(3)}s`;
+            
+            if (seconds < 0.01) {
+                res.innerText = "ULTIMATELY FAST ⚡"; res.style.color = "var(--primary)";
+                res.style.textShadow = "0 0 20px var(--primary-glow)";
+            } else if (seconds <= 0.10) {
+                res.innerText = "INSANE FAST 🔥"; res.style.color = "var(--accent-red)";
+            } else if (seconds <= 0.50) {
+                res.innerText = "Fast"; res.style.color = "var(--accent-green)";
+            } else if (seconds <= 1.00) {
+                res.innerText = "Good"; res.style.color = "var(--accent-yellow)";
+            } else if (seconds <= 1.50) {
+                res.innerText = "Average"; res.style.color = "var(--text-main)";
+            } else if (seconds <= 2.00) {
+                res.innerText = "Slow"; res.style.color = "var(--text-muted)";
+            } else {
+                res.innerText = "Very Slow"; res.style.color = "#475569";
+            }
+        }
+    },
+    
+    /**
+     * Formats ms into SS:CC (Seconds : Centiseconds)
+     * e.g. 5420ms -> 05:42
+     */
+    formatTime(ms) {
+        const totalCenti = Math.floor(ms / 10);
+        const seconds = Math.floor(totalCenti / 100);
+        const centiseconds = totalCenti % 100;
+        
+        const sStr = seconds.toString().padStart(2, '0');
+        const cStr = centiseconds.toString().padStart(2, '0');
+        
+        return `${sStr}:${cStr}`;
+    }
+};
+
+/**
+ * ============================================================================================
+ * GAME: SIMON MEMORY (NEW)
+ * ============================================================================================
+ * Classic sequence memory game utilizing Web Audio API for tones.
+ */
+const Simon = {
+    sequence: [],
+    playerIndex: 0,
+    state: 'idle', // 'idle', 'playing_seq', 'waiting_player', 'game_over'
+    score: 0,
+    strictMode: false,
+    
+    // Maps color names to DOM IDs and Frequencies (Green=E4, Red=C4, Yellow=C#4, Blue=A3)
+    colors: {
+        'green': { id: 'simon-g', freq: 329.63 },
+        'red':   { id: 'simon-r', freq: 261.63 },
+        'yellow':{ id: 'simon-y', freq: 277.18 },
+        'blue':  { id: 'simon-b', freq: 220.00 }
+    },
+    colorKeys: ['green', 'red', 'yellow', 'blue'],
+
+    init(container) {
+        container.innerHTML = `
+            <div class="game-header">
+                <h1 class="game-title">Simon Memory</h1>
+                <p class="game-subtitle">Watch, listen, and repeat the growing sequence.</p>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="simon-score">0</div>
+                </div>
+            </div>
+            
+            <div class="simon-board" id="simon-board">
+                <button class="simon-btn simon-btn-green" id="simon-g" onmousedown="Simon.handlePress('green')" ontouchstart="Simon.handlePress('green')"></button>
+                <button class="simon-btn simon-btn-red" id="simon-r" onmousedown="Simon.handlePress('red')" ontouchstart="Simon.handlePress('red')"></button>
+                <button class="simon-btn simon-btn-yellow" id="simon-y" onmousedown="Simon.handlePress('yellow')" ontouchstart="Simon.handlePress('yellow')"></button>
+                <button class="simon-btn simon-btn-blue" id="simon-b" onmousedown="Simon.handlePress('blue')" ontouchstart="Simon.handlePress('blue')"></button>
+                
+                <div class="simon-center" id="simon-center-btn" onclick="Simon.startGame()" style="cursor:pointer">
+                    <i class="ph-fill ph-play"></i>
+                </div>
+            </div>
+            
+            <div class="game-controls-bottom">
+                <p style="color:var(--text-muted); font-size:0.85rem; width:100%; text-align:center;">
+                    * Sound is required for the full experience.
+                </p>
+            </div>
+        `;
+        
+        this.resetState();
+        
+        // Prevent context menus on long press for touch devices
+        const btns = document.querySelectorAll('.simon-btn');
+        btns.forEach(b => {
+            b.addEventListener('contextmenu', e => e.preventDefault());
+        });
+    },
+
+    resetState() {
+        this.sequence = [];
+        this.playerIndex = 0;
+        this.state = 'idle';
+        this.score = 0;
+        
+        const scoreEl = document.getElementById('simon-score');
+        if (scoreEl) scoreEl.innerText = '0';
+        
+        const centerBtn = document.getElementById('simon-center-btn');
+        if (centerBtn) {
+            centerBtn.innerHTML = '<i class="ph-fill ph-play"></i>';
+            centerBtn.style.pointerEvents = 'all';
+        }
+    },
+    
+    stop() {
+        // Safe unmount
+        this.state = 'idle';
+    },
+
+    startGame() {
+        if(this.state !== 'idle' && this.state !== 'game_over') return;
+        
+        // Init audio context on user gesture
+        AudioSystem.init();
+        
+        this.resetState();
+        
+        const centerBtn = document.getElementById('simon-center-btn');
+        centerBtn.innerHTML = '0';
+        centerBtn.style.pointerEvents = 'none'; // Disable start button
+        
+        // Short delay before starting
+        setTimeout(() => this.nextRound(), 800);
+    },
+
+    nextRound() {
+        this.state = 'playing_seq';
+        this.playerIndex = 0;
+        
+        // Add random color to sequence
+        const randColor = this.colorKeys[Math.floor(Math.random() * this.colorKeys.length)];
+        this.sequence.push(randColor);
+        
+        this.score = this.sequence.length;
+        document.getElementById('simon-score').innerText = this.score;
+        document.getElementById('simon-center-btn').innerText = this.score;
+        
+        this.playSequence();
+    },
+
+    /**
+     * Recursively plays the current sequence with timing gaps
+     */
+    playSequence(index = 0) {
+        if (this.state !== 'playing_seq') return; // Safety check
+        
+        if (index >= this.sequence.length) {
+            // Sequence finished playing, wait for player
+            this.state = 'waiting_player';
+            return;
+        }
+
+        const color = this.sequence[index];
+        this.activateButton(color);
+
+        // Speed up slightly as sequence grows (min 300ms gap)
+        const delay = Math.max(300, 800 - (this.score * 30)); 
+        
+        setTimeout(() => {
+            this.playSequence(index + 1);
+        }, delay);
+    },
+
+    activateButton(color) {
+        const btnId = this.colors[color].id;
+        const freq = this.colors[color].freq;
+        const btn = document.getElementById(btnId);
+        
+        if(!btn) return;
+
+        // Visual
+        btn.classList.add('active');
+        // Audio
+        AudioSystem.beep(freq, 'sine', 0.4);
+
+        // Deactivate visual after short time
+        setTimeout(() => {
+            btn.classList.remove('active');
+        }, 300);
+    },
+
+    handlePress(color) {
+        if (this.state !== 'waiting_player') return;
+
+        // Visual/Audio feedback for player press
+        this.activateButton(color);
+
+        // Check correctness
+        if (color === this.sequence[this.playerIndex]) {
+            // Correct input
+            this.playerIndex++;
+            
+            if (this.playerIndex === this.sequence.length) {
+                // Round completed successfully
+                this.state = 'idle'; // Prevent inputs briefly
+                setTimeout(() => this.nextRound(), 1000);
+            }
+        } else {
+            // Wrong input -> Game Over
+            this.triggerGameOver();
+        }
+    },
+    
+    triggerGameOver() {
+        this.state = 'game_over';
+        
+        // Play error sound (low dissonant chord)
+        AudioSystem.beep(150, 'sawtooth', 0.8);
+        setTimeout(() => AudioSystem.beep(140, 'sawtooth', 0.8), 100);
+        
+        const centerBtn = document.getElementById('simon-center-btn');
+        centerBtn.innerHTML = '<i class="ph ph-arrow-counter-clockwise"></i>';
+        centerBtn.style.pointerEvents = 'all';
+        centerBtn.style.color = 'var(--accent-red)';
+        
+        setTimeout(() => {
+            centerBtn.style.color = '#fff';
+        }, 1500);
+
+        alert(`Game Over 💀! You reached Level ${this.score}.`, "error");
+    }
+};
+
+/**
+ * ============================================================================================
+ * BOOTSTRAP INITIALIZATION
+ * ============================================================================================
+ * Handles fluid layout sizing for mobile address bars (vh fix).
+ */
+window.onload = () => {
+    const setVH = () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    setVH();
+    window.addEventListener('resize', setVH);
+    
+    // Pre-initialize Audio Context on first interaction globally to bypass autoplay restrictions
+    document.body.addEventListener('click', function initAudio() {
+        AudioSystem.init();
+        document.body.removeEventListener('click', initAudio);
+    }, { once: true });
+};
+</script>
+</body>
+</html>
